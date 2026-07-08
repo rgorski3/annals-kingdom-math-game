@@ -44,3 +44,7 @@ and visit `http://localhost:8544`. The only network dependency is three.js r128 
 ## How it's built
 
 Vanilla JavaScript and three.js r128, ~7,000 lines in one file. Four seeded RNG streams (worldgen, detail, ambient, history) keep generation and simulation deterministic and independent — the same seed always yields the same world and the same history, at any simulation speed. Rendering is triangle-soup geometry merged per settlement with one patched Lambert material carrying seasons, snow, drought, and window-glow, instanced trees, and a canvas-texture territory overlay: the whole realm draws in well under 100 draw calls at 60 fps.
+
+## License
+
+[MIT](LICENSE)
