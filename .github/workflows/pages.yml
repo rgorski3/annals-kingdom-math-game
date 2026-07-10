@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - claude/math-game-review-26rutx
+      - master
   workflow_dispatch:
 
 permissions:
