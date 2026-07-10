@@ -7109,7 +7109,7 @@ const KR_GEN = {
     const num = parseInt(digits.join(''), 10);
     let opts = [val, d, d * Math.pow(10, Math.max(1, place-1)), d * Math.pow(10, place+1)];
     opts = [...new Set(opts)];
-    while(opts.length < 4){ const c = d * Math.pow(10, krRi(0, len-1)); opts.indexOf(c) < 0 ? opts.push(c) : opts.push(val + krRi(1, 9)); }
+    while(opts.length < 4){ const c = d * Math.pow(10, krRi(0, len-1)); const alt = opts.indexOf(c) < 0 ? c : val + krRi(1, 9); if(opts.indexOf(alt) < 0) opts.push(alt); }
     opts = opts.slice(0, 4);
     for(let i = opts.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [opts[i],opts[j]] = [opts[j],opts[i]]; }
     const names = ['ones','tens','hundreds','thousands','ten-thousands'];
@@ -7162,6 +7162,7 @@ const KR_GEN = {
     const set = [2,3,4,6,8,12];
     let d1 = krPick(set), d2; do{ d2 = krPick(set); }while(d2 === d1);
     let n1 = krRi(1, d1 - 1), n2 = krRi(1, d2 - 1);
+    if(n1 * d2 === n2 * d1){ if(d1 > 2) n1 = (n1 % (d1 - 1)) + 1; else n2 = (n2 % (d2 - 1)) + 1; }
     const sub = t >= 3 && Math.random() < 0.45;
     const lcm = d1 * d2 / krGcd(d1, d2);
     let numer, P = krPlace();
@@ -8015,6 +8016,7 @@ KR.onWorldReady = function(){
 
 function krKeyCapture(e){
   if(!KR.active || !W || !W.kr) return;
+  if(e.ctrlKey || e.altKey || e.metaKey) return;
   const p = W.kr.problem;
   if(p && p.format === 'mc' && W.kr.awaiting){
     const t = e.target, inField = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA');
@@ -8062,6 +8064,7 @@ KR.init = function(){
   window.addEventListener('keydown', krKeyCapture, true);
   window.addEventListener('keydown', e => {
     if(e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+    if(e.ctrlKey || e.altKey || e.metaKey) return;
     if(e.key.toLowerCase() === 'q'){ krAudioInit(); KR.toggleLedger(); }
   });
   krRenderSettings();
