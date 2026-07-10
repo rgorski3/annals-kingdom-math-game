@@ -3314,6 +3314,14 @@ function readRates(){
     if(k === 'tax') W.rates.tax = (+r.value)/100;
     else W.rates[k] = 0.25*Math.pow(16, +r.value);
   });
+  // The King's Reckoning: a Golden-Age buff is a multiplier layered on the slider baseline.
+  // The loop above just reset harvest/trade/birth to the raw slider value, so re-apply the
+  // active buff's current multiplier here — otherwise a slider drag wipes the buff and its
+  // decay/expiry math (krBuffDay/krClearBuff) corrupts the user-set baseline.
+  try{
+    const b = W.kr && W.kr.buff;
+    if(b && b.active) ['harvest','trade','birth'].forEach(k => { W.rates[k] *= b.applied; });
+  }catch(e){}
 }
 
 // ---------- agents ----------
@@ -6587,7 +6595,7 @@ function runAct(name){
   else if(name === 'marriage') arrangeMarriage(true);
   else if(name === 'gold'){
     // The King's Reckoning: gold is never free — it is minted only by correct arithmetic.
-    if(typeof KR !== 'undefined' && KR.active){
+    if(typeof KR !== 'undefined' && KR.meta && KR.meta.grade){
       flash('the coffers fill only by true reckoning');
       chron('flavor','The court clerks refused to conjure gold from nothing; "let the Reckoner earn it," they said.', null, null);
     } else { W.treasury += 5000; chron('crown','The crown was granted 5,000 gold marks by graces best not questioned.', null, null); }
@@ -7241,7 +7249,7 @@ const KR_GEN = {
       answer: ans, explain:`${start} + ${add} = ${ans}.` };
   },
   'g6.onestep'(t){
-    const x = krRi(20, 60 + t*30), a = krRi(50, 200), a2 = krRi(2, 9);
+    const x = krRi(20, 60 + t*30), a = krRi(Math.min(20, x-1), Math.min(200, x-1)), a2 = krRi(2, 9);
     const forms = [
       { eq:`x − ${a} = ${x-a}`, ans:x, ex:`x = ${x-a} + ${a} = ${x}`, story:`After paying ${a} marks, the coffer holds ${x-a}. How much did it hold before?` },
       { eq:`x + ${a} = ${x+a}`, ans:x, ex:`x = ${x+a} − ${a} = ${x}`, story:`After ${a} marks arrive, the coffer holds ${x+a}. How much before?` },
@@ -7294,7 +7302,10 @@ const KR_GEN = {
     const rr = krReduce(red, total), gg = krReduce(grey, total), rg = krReduce(red, grey);
     const correct = `${rr.n}/${rr.d}`;
     let opts = [correct, `${gg.n}/${gg.d}`, `${rg.n}/${rg.d}`, `${red}/${grey + total}`];
-    opts = [...new Set(opts)]; while(opts.length < 4) opts.push(`${red}/${total + opts.length}`);
+    opts = [...new Set(opts)];
+    // guard the padding loop against re-introducing a duplicate (mirrors g4.placeval's indexOf check)
+    let pad = 0;
+    while(opts.length < 4){ const c = `${red}/${total + 1 + opts.length + pad}`; if(opts.indexOf(c) < 0) opts.push(c); else pad++; }
     opts = opts.slice(0, 4);
     for(let i = opts.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [opts[i],opts[j]] = [opts[j],opts[i]]; }
     return { skill:'g7.probability', grade:7, tier:t, format:'mc',
@@ -7330,7 +7341,15 @@ function krParseNum(s){
   return isNaN(v) ? NaN : v;
 }
 function krParseFrac(s){
-  s = String(s).replace(/−/g, '-').replace(/[,\s]/g, '');
+  s = String(s).replace(/−/g, '-').trim();
+  // mixed number, e.g. "2 1/2" = 5/2, "-2 1/2" = -5/2 — detect before whitespace is stripped
+  const mm = s.match(/^(-?)(\d+)\s+(\d+)\/(\d+)$/);
+  if(mm){
+    const d = +mm[4]; if(d === 0) return null;
+    const mag = (+mm[2]) * d + (+mm[3]);
+    return { n: (mm[1] === '-' ? -mag : mag), d };
+  }
+  s = s.replace(/[,\s]/g, '');
   const m = s.match(/^(-?\d+)\/(-?\d+)$/);
   if(!m) return null;
   let n = +m[1], d = +m[2];
@@ -7467,7 +7486,7 @@ function krInitEconomy(){
   if(!KR.meta) KR.meta = krLoadMeta();
   W.kr = {
     streak:0, best:0, tallies:0, answered:0, sessionGold:0, goldPeak:0,
-    tier:{}, win:{}, grace:false, lastSkill:null,
+    tier:{}, win:{}, grace:{}, lastSkill:null,
     problem:null, problemAt:0, awaiting:false, goldenToken:false,
     buff:{ active:false }, decrees:[], decreesDone:false,
     correctCount:0, chestNext:krChestGap(),
@@ -7574,7 +7593,9 @@ function krRenderProblem(p){
     if(p.format === 'twofield'){ el.input2.style.display = ''; el.input.placeholder = 'each'; }
     else { el.input2.style.display = 'none'; el.input.placeholder = '…'; }
     el.unit.textContent = p.unit || '';
-    setTimeout(() => { try{ el.input.focus(); }catch(e){} }, 30);
+    // focus synchronously right after render: any async gap lets a typed digit reach the global
+    // speed-hotkey handler before the input is focused. The field is already visible here.
+    try{ el.input.focus(); }catch(e){}
   }
 }
 function krSubmit(forced){
@@ -7636,17 +7657,24 @@ function krOnWrong(p, solveMs, mcIdx){
 }
 function krRecordResult(skill, correct, solveMs){
   const kr = W.kr; if(!kr.win[skill]) kr.win[skill] = [];
+  if(!kr.grace || typeof kr.grace !== 'object') kr.grace = {};
   const w = kr.win[skill]; w.push({ correct, ms:solveMs }); if(w.length > 5) w.shift();
   const tier = kr.tier[skill] || 1;
   const last3 = w.slice(-3), wrong3 = last3.filter(x => !x.correct).length;
   const twoConsec = w.length >= 2 && !w[w.length-1].correct && !w[w.length-2].correct;
-  if(!correct && (wrong3 >= 2 || twoConsec)){ if(tier > 1){ kr.tier[skill] = tier - 1; kr.grace = true; } return; }
+  if(!correct && (wrong3 >= 2 || twoConsec)){
+    // demotion: set per-skill grace and start a fresh window so the next 3-streak must be earned anew
+    if(tier > 1){ kr.tier[skill] = tier - 1; kr.grace[skill] = true; kr.win[skill] = []; }
+    return;
+  }
   if(correct){
-    if(kr.grace){ kr.grace = false; return; }
+    // grace is per-skill: a demoted skill's first correct answer never re-promotes; window resets so the streak is non-overlapping
+    if(kr.grace[skill]){ kr.grace[skill] = false; kr.win[skill] = []; return; }
     if(last3.length === 3 && last3.every(x => x.correct) && tier < 5){
       const times = last3.map(x => x.ms).sort((a,b) => a-b), med = times[1];
       const thr = (KR_FAST[KR.meta.grade || 5] || KR_FAST[5])[tier-1] * 1000;
-      if(med < thr) kr.tier[skill] = tier + 1;
+      // promotion consumes the window so a fresh, non-overlapping 3-streak is needed for the next tier
+      if(med < thr){ kr.tier[skill] = tier + 1; kr.win[skill] = []; }
     }
   }
 }
@@ -7775,12 +7803,21 @@ function krCrisisJudge(p, ok, solveMs, mcIdx){
     if(p.format === 'mc') krHighlightChip(mcIdx, true);
     krMasteryGain(p.skill, p.tier, true);
     kr.streak++; kr.best = Math.max(kr.best, kr.streak); krRenderStreak();
+    // crisis play must feed the same progression as normal answers (ranks, decrees, adaptive tiers).
+    // c.got already drives the crisis bar and the crisisClean decree — do not touch those here.
+    kr.tallies++; kr.answered++; KR.meta.careerTallies++;
+    krRecordResult(p.skill, true, solveMs);
+    krBumpDecrees({ correct:true, skill:p.skill, streak:kr.streak, solveMs, reward:0 });
+    krCheckRank();
   } else {
     c.wrong++; c.errors++; c.endAt -= 4000;
     krFlash('wrong'); krAudioWrong();
     krSetFeedback('bad','✕', 'The clerk’s tally: ' + krAnswerText(p));
     if(p.format === 'mc'){ if(typeof mcIdx === 'number') krHighlightChip(mcIdx, false); krHighlightChip(p.answer, true); }
     kr.streak = 0; krRenderStreak();
+    kr.answered++;
+    krRecordResult(p.skill, false, solveMs);
+    krBumpDecrees({ correct:false });
   }
   krCrisisRenderBar(); krScheduleNext(ok ? 650 : 1400);
 }
@@ -7940,13 +7977,20 @@ function krSetGrade(g){
   KR.active = true;
   KR.el.ledger.classList.remove('krHidden');
   document.getElementById('krToggle').classList.add('on');
-  W.kr.tier = {}; W.kr.win = {};
+  W.kr.tier = {}; W.kr.win = {}; W.kr.grace = {};
   KR_GRADE_SKILLS[g].forEach(s => { W.kr.tier[s] = (KR.meta.mastery[s] >= 75) ? 3 : (KR.meta.mastery[s] >= 40 ? 2 : 1); W.kr.win[s] = []; });
   krRollDecrees(); krRenderDecrees(); krRenderStreak(); krRenderRank();
   krChron('crown','A new Reckoner takes up the Crown’s ledger. Let the counting begin.', W.settlements[0].x, W.settlements[0].z, 4);
   krNext();
 }
 KR.toggleLedger = function(){
+  // Never fold the Ledger mid-crisis: the answer UI must stay reachable or the countdown is an unwinnable loss.
+  if(W && W.kr && W.kr.crisis){
+    KR.el.ledger.classList.remove('krHidden');
+    document.getElementById('krToggle').classList.add('on');
+    KR.active = true;
+    return;
+  }
   if(!KR.meta.grade){ KR.el.grade.classList.remove('krHidden'); return; }
   const hidden = KR.el.ledger.classList.toggle('krHidden');
   document.getElementById('krToggle').classList.toggle('on', !hidden);
