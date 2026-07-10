@@ -232,6 +232,17 @@ body.aiming #app canvas{cursor:crosshair}
   #drawer .drow{flex-wrap:wrap;row-gap:6px}
   .actrow{max-height:none}
   #chronHead button{padding:5px 10px}
+  /* --- The King's Reckoning, pocket layout --- */
+  #ledger{bottom:calc(8px + env(safe-area-inset-bottom));width:calc(100vw - 16px);padding:10px 12px 12px}
+  #ledger #krPrompt{font-size:15px}
+  #krInput{font-size:19px;width:44%;min-height:46px}
+  .krChip{flex:1 1 44%;font-size:15px}
+  #krCrisis{top:calc(112px + env(safe-area-inset-top));width:calc(100vw - 16px)}
+  #krRaven{right:8px;left:8px;width:auto;bottom:calc(78px + env(safe-area-inset-bottom))}
+  #krStudies{left:8px;right:8px;width:auto;bottom:calc(78px + env(safe-area-inset-bottom))}
+  #chron:not(.folded) ~ #ledger{opacity:.25}
+  .krCard{padding:20px 16px}
+  .krGradeBtn{min-height:84px}
 }
 
 /* ---------- labels ---------- */
@@ -265,6 +276,134 @@ body.aiming #app canvas{cursor:crosshair}
 #errbox h2{font-variant:small-caps;font-weight:normal;margin-bottom:10px}
 #errbox pre{font-size:12px;color:#7a3020;white-space:pre-wrap;text-align:left;margin:10px 0;
   font-family:Consolas,monospace;max-height:200px;overflow:auto}
+
+/* =======================================================================
+   THE KING'S RECKONING — math game layer (CSS)
+   ======================================================================= */
+:root{ --oxblood:#7a2c22; --fire:#e8552a; }
+/* the Reckoning Ledger — docked bottom-center */
+#ledger{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:30;
+  width:min(560px, 94vw);padding:12px 16px 13px;user-select:none;
+  touch-action:manipulation;transition:opacity .3s, transform .3s}
+#ledger.krHidden{display:none}
+#ledger .krTop{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+#ledger .krTop .sp{flex:1}
+#krStreak{display:flex;align-items:center;gap:6px;min-width:74px}
+#krFlame{font-size:22px;line-height:1;filter:drop-shadow(0 0 0 rgba(232,85,42,0));transition:transform .25s, filter .25s;transform-origin:50% 90%}
+#krStreak .kmul{font-size:13px;color:#7a5d10;font-variant:small-caps;white-space:nowrap}
+#krStreak .kcount{font-size:11px;color:var(--ink-soft);font-style:italic}
+#krRankBadge{display:flex;align-items:center;gap:6px;cursor:pointer;padding:2px 8px;border:1px solid var(--rule);border-radius:12px;background:rgba(255,250,236,.35)}
+#krRankBadge:hover{background:rgba(201,162,39,.16)}
+#krRankBadge .kseal{font-size:16px;color:var(--gold)}
+#krRankBadge .krank{font-size:12.5px;font-variant:small-caps;color:#6b4f10;white-space:nowrap}
+#krPrompt{font-size:16.5px;line-height:1.46;color:var(--ink);min-height:2.4em;margin:2px 0 9px}
+#krPrompt .kghost{display:block;font-size:11.5px;font-style:italic;color:#9a8a5c;margin-top:3px}
+#krAnswerRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#krInput{font-family:var(--serif);font-size:20px;color:var(--ink);background:rgba(255,252,240,.75);
+  border:1.5px solid var(--rule);border-radius:3px;padding:6px 10px;width:150px;text-align:center;
+  transition:border-color .2s, box-shadow .2s}
+#krInput:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,162,39,.25)}
+#krInput2{width:96px}
+.krUnit{font-size:14px;color:var(--ink-soft);font-style:italic}
+#krEnter{font-family:var(--serif);font-size:15px;font-variant:small-caps;color:#5c4410;cursor:pointer;
+  background:linear-gradient(175deg,#f0e2bc,#e2cf9e);border:1px solid var(--gold);border-radius:3px;
+  padding:7px 16px;min-height:40px}
+#krEnter:hover{background:#efe0b4}
+#krEnter:active{transform:translateY(1px)}
+.krField.correct #krInput{border-color:var(--gold);box-shadow:0 0 12px rgba(201,162,39,.5)}
+.krField.wrong #krInput{border-color:var(--oxblood);box-shadow:0 0 8px rgba(122,44,34,.4)}
+@keyframes krShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.krField.wrong.krShake #krInput{animation:krShake .34s}
+#krChoices{display:flex;flex-wrap:wrap;gap:8px}
+.krChip{font-family:var(--serif);font-size:16px;color:var(--ink);cursor:pointer;flex:1 1 46%;
+  min-height:46px;background:rgba(255,250,236,.5);border:1.5px solid var(--rule);border-radius:3px;
+  padding:8px 10px;text-align:center;transition:border-color .15s, background .15s}
+.krChip:hover{border-color:var(--gold);background:rgba(201,162,39,.14)}
+.krChip .kk{font-size:11px;color:#9a8a5c;font-style:italic;margin-right:5px}
+.krChip.correct{border-color:var(--gold);background:rgba(201,162,39,.3)}
+.krChip.wrong{border-color:var(--oxblood);background:rgba(122,44,34,.16)}
+#krFeedback{font-size:13px;font-style:italic;color:var(--ink-soft);min-height:1.3em;margin-top:8px;line-height:1.4}
+#krFeedback.good{color:#6b4f10}
+#krFeedback.bad{color:var(--oxblood)}
+#krFeedback .kg{font-style:normal;font-weight:bold;padding-right:4px}
+#krDecrees{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.krSeal{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-soft);
+  background:rgba(122,44,34,.09);border:1px solid rgba(179,160,117,.6);border-radius:11px;padding:2px 9px;line-height:1.2}
+.krSeal .kwax{font-size:12px}
+.krSeal.done{color:#6b4f10;background:rgba(201,162,39,.16);border-color:var(--gold)}
+.krSeal.close{border-color:var(--gold);box-shadow:0 0 6px rgba(201,162,39,.4)}
+/* coin particles */
+.krCoin{position:fixed;z-index:40;width:12px;height:12px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at 35% 30%, #f6e08a, var(--gold) 70%, #8a6f16);
+  box-shadow:0 0 6px rgba(201,162,39,.7)}
+/* grade select + generic KR modal overlay */
+.krOverlay{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% 40%, rgba(40,30,14,.55), rgba(18,12,6,.82));padding:20px}
+.krOverlay.krHidden{display:none}
+.krCard{max-width:520px;width:100%;padding:26px 30px;text-align:center}
+.krCard h2{font-variant:small-caps;font-weight:normal;font-size:26px;letter-spacing:.04em;color:var(--ink);margin-bottom:4px}
+.krCard .ksub{font-style:italic;color:var(--ink-soft);font-size:15px;margin-bottom:18px;line-height:1.5}
+.krGradeRow{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+.krGradeBtn{font-family:var(--serif);cursor:pointer;flex:1 1 108px;min-width:100px;min-height:96px;
+  background:linear-gradient(175deg,var(--parch),var(--parch2));border:1.5px solid var(--rule);border-radius:4px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:12px}
+.krGradeBtn:hover{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,162,39,.3)}
+.krGradeBtn.on{border-color:var(--gold);background:rgba(201,162,39,.2)}
+.krGradeBtn .kgn{font-size:30px;color:#6b4f10;font-variant:small-caps}
+.krGradeBtn .kgl{font-size:11.5px;color:var(--ink-soft);font-style:italic;line-height:1.25}
+.krHint{font-size:12px;color:#8a7856;font-style:italic;margin-top:8px}
+.krRow{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap;margin-top:10px}
+.krToggle{font-family:var(--serif);font-size:13px;font-variant:small-caps;cursor:pointer;color:var(--ink);
+  background:transparent;border:1px solid #8a7a54;border-radius:3px;padding:5px 12px;min-height:36px}
+.krToggle.on{border-color:var(--gold);color:#6b4f10;background:rgba(201,162,39,.15)}
+.krLink{color:#6b4f10;cursor:pointer;text-decoration:underline;font-style:italic;font-size:13px}
+/* crisis bar */
+#krCrisis{position:fixed;top:74px;left:50%;transform:translateX(-50%);z-index:31;width:min(520px,94vw);
+  padding:8px 14px;display:none;background:linear-gradient(175deg,#7a2c22,#5c2018);border:1px solid #3d140e;
+  border-radius:3px;color:#f2e4d0;box-shadow:0 2px 12px rgba(0,0,0,.55)}
+#krCrisis .kch{display:flex;align-items:center;gap:10px;font-variant:small-caps;font-size:14.5px;letter-spacing:.04em}
+#krCrisis .kctime{margin-left:auto;font-size:15px;font-variant:normal;font-feature-settings:"tnum"}
+#krCrisis .kcbar{height:8px;background:rgba(0,0,0,.3);border-radius:4px;margin-top:6px;overflow:hidden}
+#krCrisis .kcbar div{height:100%;width:0;background:linear-gradient(90deg,#c9a227,#f0d878);transition:width .3s}
+#krCrisis .kcsub{font-size:11.5px;font-style:italic;color:#e8d3b8;margin-top:3px}
+/* raven telegraph */
+#krRaven{position:fixed;right:16px;bottom:16px;z-index:32;width:280px;padding:12px 15px;display:none;
+  border:1px solid #3d140e;background:linear-gradient(175deg,#f0e2bc,#e2cf9e)}
+#krRaven .krv-t{font-variant:small-caps;font-size:15px;color:var(--oxblood);margin-bottom:3px}
+#krRaven .krv-b{font-size:13px;color:var(--ink);font-style:italic;line-height:1.4;margin-bottom:9px}
+#krRaven .krv-row{display:flex;gap:8px}
+#krRaven button{font-family:var(--serif);cursor:pointer;flex:1;min-height:40px;font-size:13.5px;font-variant:small-caps;border-radius:3px}
+#krRaven .krv-yes{background:linear-gradient(175deg,#8a3428,#6b241a);color:#f2e4d0;border:1px solid #3d140e}
+#krRaven .krv-no{background:transparent;border:1px solid #8a7a54;color:var(--ink)}
+@keyframes krRavenIn{from{transform:translateX(30px);opacity:0}to{transform:translateX(0);opacity:1}}
+#krRaven.show{display:block;animation:krRavenIn .4s ease-out}
+/* chest / reward pop */
+#krPop{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%) scale(.6);z-index:55;
+  padding:20px 30px;text-align:center;display:none;opacity:0;transition:opacity .3s, transform .3s;pointer-events:none;min-width:220px}
+#krPop.show{display:block;opacity:1;transform:translate(-50%,-50%) scale(1)}
+#krPop .kp-ico{font-size:46px;line-height:1}
+#krPop .kp-t{font-variant:small-caps;font-size:20px;color:#6b4f10;margin-top:4px}
+#krPop .kp-s{font-size:14px;font-style:italic;color:var(--ink-soft);margin-top:2px}
+/* gilded vignette at high streak */
+#krGild{position:fixed;inset:0;pointer-events:none;z-index:6;opacity:0;transition:opacity .8s;
+  box-shadow:inset 0 0 120px rgba(201,162,39,.0)}
+#krGild.on{opacity:1;box-shadow:inset 0 0 140px rgba(201,162,39,.45)}
+/* studies / settings foldout */
+#krStudies{position:fixed;left:12px;bottom:12px;z-index:33;width:262px;max-height:70vh;overflow-y:auto;
+  padding:12px 14px;display:none}
+#krStudies.show{display:block}
+#krStudies h3{font-variant:small-caps;font-weight:normal;font-size:16px;color:var(--ink);margin-bottom:6px;display:flex}
+#krStudies h3 .x{margin-left:auto;cursor:pointer;color:var(--ink-soft)}
+.krMastery{margin:7px 0}
+.krMastery .kml{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-soft);margin-bottom:2px}
+.krMastery .kml b{color:var(--ink);font-weight:normal;font-variant:small-caps}
+.krMastery .kmbar{height:6px;background:rgba(120,95,40,.18);border-radius:3px;overflow:hidden}
+.krMastery .kmbar div{height:100%;background:linear-gradient(90deg,#8a6f2a,#c9a227)}
+#krStudies .krDivider{border-top:1px solid var(--rule);margin:11px 0 8px}
+@media(prefers-reduced-motion: reduce){ #krFlame{transition:none} .krField.wrong.krShake #krInput{animation:none} }
+body.krReduceMotion #krFlame{transition:none!important}
+body.krReduceMotion .krField.wrong.krShake #krInput{animation:none!important}
+
 .hidden{display:none!important}
 </style>
 </head>
@@ -375,6 +514,8 @@ body.aiming #app canvas{cursor:crosshair}
 <div id="beatCard" class="parch"><span class="bd" id="beatDate"></span><div class="bt" id="beatText"></div></div>
 <div id="watchDate" class="parch"></div>
 <div id="quickIcons">
+  <button id="krToggle" title="The Reckoning — solve to fill the treasury (Q)">✒</button>
+  <button id="krStudiesBtn" title="Reckoner's Studies — mastery &amp; settings">📜</button>
   <button id="icoOverlay" title="Overlays — territories, trade, population…">🗺</button>
   <button id="icoWatch" title="Watch mode — the realm narrates itself (C)">👁</button>
   <button id="icoDirector" title="Director — takes the camera when you are idle (G)" class="on">🎬</button>
@@ -389,6 +530,72 @@ body.aiming #app canvas{cursor:crosshair}
 <div id="camFrame"></div>
 
 <div id="stats"></div>
+
+<!-- ======================================================================
+     THE KING'S RECKONING — math game layer (DOM)
+     ====================================================================== -->
+<div id="krGild"></div>
+<div id="krCrisis" class="parch">
+  <div class="kch"><span id="krcTitle">A crisis stirs</span><span class="kctime" id="krcTime">0:45</span></div>
+  <div class="kcbar"><div id="krcFill"></div></div>
+  <div class="kcsub" id="krcSub"></div>
+</div>
+<div id="ledger" class="parch krHidden">
+  <div class="krTop">
+    <div id="krStreak" title="Answer streak — string them true for Festivals and Golden Ages">
+      <span id="krFlame">🕯</span>
+      <div><div class="kmul" id="krMul">×1.0</div><div class="kcount" id="krStreakN">streak 0</div></div>
+    </div>
+    <span class="sp"></span>
+    <div id="krRankBadge" title="Your Reckoner rank — open Studies">
+      <span class="kseal" id="krSeal">✶</span><span class="krank" id="krRankTxt">Apprentice Clerk</span>
+    </div>
+  </div>
+  <div id="krPrompt">The realm awaits its Reckoner.</div>
+  <div class="krField" id="krField">
+    <div id="krAnswerRow">
+      <input id="krInput" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="…">
+      <input id="krInput2" class="krField" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="rem" style="display:none">
+      <span class="krUnit" id="krUnit"></span>
+      <button id="krEnter">Reckon ▸</button>
+    </div>
+    <div id="krChoices" style="display:none"></div>
+  </div>
+  <div id="krFeedback"></div>
+  <div id="krDecrees"></div>
+</div>
+<div id="krRaven" class="parch">
+  <div class="krv-t" id="krRavenT">A raven comes</div>
+  <div class="krv-b" id="krRavenB"></div>
+  <div class="krv-row"><button class="krv-yes" id="krRavenYes">Reckon</button><button class="krv-no" id="krRavenNo">Not yet</button></div>
+</div>
+<div id="krPop" class="parch"><div class="kp-ico" id="krPopIco">✦</div><div class="kp-t" id="krPopT"></div><div class="kp-s" id="krPopS"></div></div>
+<div id="krStudies" class="parch">
+  <h3>Reckoner's Studies <span class="x" id="krStudiesX">✕</span></h3>
+  <div id="krStudiesBody"></div>
+  <div class="krDivider"></div>
+  <div class="krRow" style="justify-content:flex-start">
+    <button class="krToggle" id="krSound">🔊 Sound</button>
+    <button class="krToggle" id="krMotion">Motion</button>
+    <button class="krToggle" id="krGentle">Gentle Realm</button>
+  </div>
+  <div class="krHint" id="krCareer" style="margin-top:8px"></div>
+  <div class="krHint"><span class="krLink" id="krChangeGrade">Change grade band</span></div>
+</div>
+<div id="krGrade" class="krOverlay krHidden">
+  <div class="krCard parch">
+    <h2 id="krGradeH">The Realm Needs a Reckoner</h2>
+    <div class="ksub" id="krGradeSub">The old Reckoner is dead. Only you can count the Crown's gold. Choose your grade band — a parent or teacher may set it, and it will be remembered.</div>
+    <div class="krGradeRow">
+      <button class="krGradeBtn" data-g="4"><span class="kgn">IV</span><span class="kgl">Grade 4<br>+ − × ÷, fractions</span></button>
+      <button class="krGradeBtn" data-g="5"><span class="kgn">V</span><span class="kgl">Grade 5<br>decimals, fractions</span></button>
+      <button class="krGradeBtn" data-g="6"><span class="kgn">VI</span><span class="kgl">Grade 6<br>ratios, %, negatives</span></button>
+      <button class="krGradeBtn" data-g="7"><span class="kgn">VII</span><span class="kgl">Grade 7<br>proportion, algebra</span></button>
+    </div>
+    <div class="krHint">Not sure? Grade 5 is a fair place to start. The realm adjusts to how you fare.</div>
+    <div class="krRow"><span class="krLink" id="krJustWatch">Just watch the realm for now</span></div>
+  </div>
+</div>
 
 <div id="loading">
   <div class="frame">
@@ -3011,6 +3218,7 @@ function initEconomy(){
   W.settlements.forEach(s => { initSettlementEconomy(s); realmPop += s.pop; });
   W.realmPop = realmPop;
   buildTradeRoutes();
+  if(typeof krInitEconomy === 'function') krInitEconomy();
 }
 function initSettlementEconomy(s){
   let farm=0, forest=0, rock=0, tot=0;
@@ -3106,6 +3314,14 @@ function readRates(){
     if(k === 'tax') W.rates.tax = (+r.value)/100;
     else W.rates[k] = 0.25*Math.pow(16, +r.value);
   });
+  // The King's Reckoning: a Golden-Age buff is a multiplier layered on the slider baseline.
+  // The loop above just reset harvest/trade/birth to the raw slider value, so re-apply the
+  // active buff's current multiplier here — otherwise a slider drag wipes the buff and its
+  // decay/expiry math (krBuffDay/krClearBuff) corrupts the user-set baseline.
+  try{
+    const b = W.kr && W.kr.buff;
+    if(b && b.active) ['harvest','trade','birth'].forEach(k => { W.rates[k] *= b.applied; });
+  }catch(e){}
 }
 
 // ---------- agents ----------
@@ -6377,7 +6593,13 @@ function runAct(name){
   if(name === 'assassinate') actAssassinate();
   else if(name === 'contest') actContest();
   else if(name === 'marriage') arrangeMarriage(true);
-  else if(name === 'gold'){ W.treasury += 5000; chron('crown','The crown was granted 5,000 gold marks by graces best not questioned.', null, null); }
+  else if(name === 'gold'){
+    // The King's Reckoning: gold is never free — it is minted only by correct arithmetic.
+    if(typeof KR !== 'undefined' && KR.meta && KR.meta.grade){
+      flash('the coffers fill only by true reckoning');
+      chron('flavor','The court clerks refused to conjure gold from nothing; "let the Reckoner earn it," they said.', null, null);
+    } else { W.treasury += 5000; chron('crown','The crown was granted 5,000 gold marks by graces best not questioned.', null, null); }
+  }
   else if(name === 'flood') startFlood(day);
   else if(name === 'drought'){ if(!W.drought) startDrought(day); }
   else if(name === 'comet') sendComet(day);
@@ -6644,6 +6866,7 @@ async function forgeWorld(seed){
     lo.style.opacity = 0;
     setTimeout(()=> lo.classList.add('hidden'), 1300);
     window.__annalsReady = true; ANNALS.ready = true;
+    if(typeof KR !== 'undefined' && KR.onWorldReady) KR.onWorldReady();
     console.log('[ANNALS] seed='+seed+' realm='+W.realmName+' settlements='+W.settlements.length+
       ' buildings='+countBuildings()+' trees='+(W.flora.dec.length+W.flora.pine.length)+
       ' rivers='+W.rivers.length+' lakes='+W.lakes.length+' coast='+W.hasCoast);
@@ -6801,6 +7024,1084 @@ window.ANNALS = {
   speed(i){ setSpeed(clamp(i,0,4)); },
   seed(s){ history.replaceState(null,'','#s='+encodeURIComponent(s)); return forgeWorld(String(s)); }
 };
+
+/* =======================================================================
+   THE KING'S RECKONING — math game layer (logic)
+   A layer atop The Annals: math is the only tap that fills the treasury
+   and the only shield against the sim's crises. Lives inside the game IIFE
+   so it can reach W, chron, runAct, setSpeed, infect, foundVillage, etc.
+   ======================================================================= */
+
+/* ----- KR-PURE-START : self-contained, DOM-free math engine (extractable
+        for node tests; only touches W behind typeof guards) ----- */
+function kgrp(n){
+  const neg = n < 0; let s = Math.abs(n).toString();
+  let dp = ''; const dot = s.indexOf('.'); if(dot >= 0){ dp = s.slice(dot); s = s.slice(0, dot); }
+  s = s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return (neg ? '-' : '') + s + dp;
+}
+function krRi(a, b){ return Math.floor(a + Math.random() * (b - a + 1)); }
+function krPick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+function krGcd(a, b){ a = Math.abs(a); b = Math.abs(b); while(b){ const t = a % b; a = b; b = t; } return a || 1; }
+function krReduce(n, d){ if(d < 0){ n = -n; d = -d; } const g = krGcd(n, d); return { n: n / g, d: d / g }; }
+
+const KR_PLACES_FALLBACK = ['Aldenmoor','Highcairn','Wrenford','Oxbow','Thornhold','Greymarch','Ashby','Dunmere'];
+function krPlace(){
+  try{ if(typeof W !== 'undefined' && W && W.settlements && W.settlements.length) return krPick(W.settlements).name; }catch(e){}
+  return krPick(KR_PLACES_FALLBACK);
+}
+
+// ---- problem factory: makeProblem via KR_GEN[skill](tier) → {prompt,answer,format,skill,tier,accept-by-krValidate} ----
+const KR_GEN = {
+  // ===== GRADE 4 =====
+  'g4.add'(t){
+    const mx = [0,250,999,3000,6000,9999][t];
+    const three = t >= 4 && Math.random() < 0.5;
+    const a = krRi(120, mx), b = krRi(120, mx), c = three ? krRi(120, mx) : 0;
+    const ans = a + b + c, P = krPlace();
+    return { skill:'g4.add', grade:4, tier:t, format:'int', unit:'marks',
+      prompt: three
+        ? `The reeve of ${P} tallies ${kgrp(a)}, ${kgrp(b)} and ${kgrp(c)} marks in three coffers. How many marks in all?`
+        : `The reeve counts ${kgrp(a)} marks in the east coffer of ${P} and ${kgrp(b)} in the west. How many marks in all?`,
+      answer: ans, explain:`${kgrp(a)} + ${kgrp(b)}${c ? ` + ${kgrp(c)}` : ''} = ${kgrp(ans)}.` };
+  },
+  'g4.sub'(t){
+    const mx = [0,300,999,3000,6000,9999][t];
+    const a = krRi(Math.floor(mx*0.55), mx), b = krRi(Math.floor(mx*0.15), a-1);
+    const ans = a - b, P = krPlace();
+    return { skill:'g4.sub', grade:4, tier:t, format:'int', unit:'bushels',
+      prompt:`The granary at ${P} held ${kgrp(a)} bushels; ${kgrp(b)} were eaten over winter. How many remain?`,
+      answer: ans, explain:`${kgrp(a)} − ${kgrp(b)} = ${kgrp(ans)}.` };
+  },
+  'g4.multfact'(t){
+    const hi = t <= 2 ? 9 : 12, lo = t <= 2 ? 2 : 3;
+    const a = krRi(lo, hi), b = krRi(lo, hi), ans = a * b;
+    return { skill:'g4.multfact', grade:4, tier:t, format:'int', unit:'arrows',
+      prompt:`Each longbowman carries ${a} arrows. A file has ${b} men. How many arrows in all?`,
+      answer: ans, explain:`${a} × ${b} = ${ans}.` };
+  },
+  'g4.mult2x2'(t){
+    const lo = [0,12,14,18,22,30][t], hi = [0,29,40,55,75,99][t];
+    const a = krRi(lo, hi), b = krRi(lo, hi), ans = a * b;
+    return { skill:'g4.mult2x2', grade:4, tier:t, format:'int', unit:'pennies',
+      prompt:`A caravan pays ${a} pennies toll at each of ${b} gates. How many pennies in all?`,
+      answer: ans, explain:`${a} × ${b} = ${kgrp(ans)}.` };
+  },
+  'g4.longdiv'(t){
+    const dv = krRi(3, t <= 2 ? 7 : 9);
+    const q = krRi(t <= 2 ? 12 : 24, t <= 2 ? 70 : 140);
+    const r = krRi(1, dv - 1);
+    const dd = dv * q + r, P = krPlace();
+    return { skill:'g4.longdiv', grade:4, tier:t, format:'twofield', unit:'each · left over',
+      prompt:`${kgrp(dd)} loaves are shared among ${dv} abbeys near ${P}. How many loaves each, and how many left over?`,
+      answer:{ q, r }, explain:`${kgrp(dd)} ÷ ${dv} = ${q} remainder ${r}.` };
+  },
+  'g4.placeval'(t){
+    const len = t <= 2 ? 4 : 5;
+    const place = krRi(1, len - 1);
+    const d = krRi(2, 9);
+    const digits = [];
+    for(let i = 0; i < len; i++){
+      if(i === len - 1 - place) digits.push(d);
+      else { let x; do{ x = krRi(i === 0 ? 1 : 0, 9); }while(x === d); digits.push(x); }
+    }
+    const val = d * Math.pow(10, place);
+    const num = parseInt(digits.join(''), 10);
+    let opts = [val, d, d * Math.pow(10, Math.max(1, place-1)), d * Math.pow(10, place+1)];
+    opts = [...new Set(opts)];
+    while(opts.length < 4){ const c = d * Math.pow(10, krRi(0, len-1)); const alt = opts.indexOf(c) < 0 ? c : val + krRi(1, 9); if(opts.indexOf(alt) < 0) opts.push(alt); }
+    opts = opts.slice(0, 4);
+    for(let i = opts.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [opts[i],opts[j]] = [opts[j],opts[i]]; }
+    const names = ['ones','tens','hundreds','thousands','ten-thousands'];
+    return { skill:'g4.placeval', grade:4, tier:t, format:'mc',
+      prompt:`In the tithe of ${kgrp(num)} marks, what is the value of the digit ${d}?`,
+      choices: opts.map(x => kgrp(x)), answer: opts.indexOf(val),
+      explain:`The ${d} sits in the ${names[place]} place — its value is ${kgrp(val)}.` };
+  },
+  'g4.fracbasic'(t){
+    const den = krPick(t <= 2 ? [2,3,4] : [2,3,4,6,8]);
+    const num = krRi(1, den - 1);
+    const count = den * krRi(2, t + 3);
+    const ans = num * count / den;
+    return { skill:'g4.fracbasic', grade:4, tier:t, format:'int', unit:'knights',
+      prompt:`Of ${count} knights at the muster, ${num}/${den} ride to war. How many knights ride?`,
+      answer: ans, explain:`${num}/${den} of ${count} = ${count} ÷ ${den} × ${num} = ${ans}.` };
+  },
+  'g4.round'(t){
+    const place = krPick(t <= 2 ? [10,100] : [100,1000]);
+    const n = krRi(place*3 + 7, place*90);
+    const ans = Math.round(n / place) * place;
+    const pn = { 10:'ten', 100:'hundred', 1000:'thousand' }[place];
+    return { skill:'g4.round', grade:4, tier:t, format:'int', unit:'men',
+      prompt:`Round the muster of ${kgrp(n)} men to the nearest ${pn}.`,
+      answer: ans, explain:`${kgrp(n)} to the nearest ${pn} is ${kgrp(ans)}.` };
+  },
+  // ===== GRADE 5 =====
+  'g5.decadd'(t){
+    const a = krRi(105, 300 + t*200) / 100, b = krRi(105, 200 + t*150) / 100;
+    const ans = Math.round((a + b) * 100) / 100;
+    return { skill:'g5.decadd', grade:5, tier:t, format:'decimal', unit:'marks', tol:0.001,
+      prompt:`Cloth costs ${a.toFixed(2)} marks the bolt; the dye adds ${b.toFixed(2)}. What is the total per bolt?`,
+      answer: ans, explain:`${a.toFixed(2)} + ${b.toFixed(2)} = ${ans.toFixed(2)}.` };
+  },
+  'g5.decmult'(t){
+    const a = krRi(2, 9) / 10, h = krRi(4, 6 + t*2);
+    const ans = Math.round(a * h * 100) / 100;
+    return { skill:'g5.decmult', grade:5, tier:t, format:'decimal', unit:'inches', tol:0.001,
+      prompt:`A candle burns ${a.toFixed(1)} of an inch each hour for ${h} hours. How many inches burn away?`,
+      answer: ans, explain:`${a.toFixed(1)} × ${h} = ${ans}.` };
+  },
+  'g5.decdiv'(t){
+    const per = krRi(110, 200 + t*120) / 100, n = krRi(3, 4 + t);
+    const total = Math.round(per * n * 100) / 100;
+    return { skill:'g5.decdiv', grade:5, tier:t, format:'decimal', unit:'marks', tol:0.001,
+      prompt:`${total.toFixed(2)} marks are split evenly among ${n} masons. What is each mason's share?`,
+      answer: per, explain:`${total.toFixed(2)} ÷ ${n} = ${per.toFixed(2)}.` };
+  },
+  'g5.fracunlike'(t){
+    const set = [2,3,4,6,8,12];
+    let d1 = krPick(set), d2; do{ d2 = krPick(set); }while(d2 === d1);
+    let n1 = krRi(1, d1 - 1), n2 = krRi(1, d2 - 1);
+    if(n1 * d2 === n2 * d1){ if(d1 > 2) n1 = (n1 % (d1 - 1)) + 1; else n2 = (n2 % (d2 - 1)) + 1; }
+    const sub = t >= 3 && Math.random() < 0.45;
+    const lcm = d1 * d2 / krGcd(d1, d2);
+    let numer, P = krPlace();
+    if(sub){
+      if(n1/d1 < n2/d2){ [d1,d2] = [d2,d1]; [n1,n2] = [n2,n1]; }
+      numer = n1*(lcm/d1) - n2*(lcm/d2);
+    } else numer = n1*(lcm/d1) + n2*(lcm/d2);
+    const red = krReduce(numer, lcm);
+    return { skill:'g5.fracunlike', grade:5, tier:t, format:'fraction', unit:'of the wall', tol:0.01,
+      prompt: sub
+        ? `The mason at ${P} had laid ${n1}/${d1} of a wall, but ${n2}/${d2} of it fell in the night. What part still stands? (as a fraction)`
+        : `The mason laid ${n1}/${d1} of the wall by noon and ${n2}/${d2} more by dusk. What part stands in all? (as a fraction)`,
+      answer:{ n:red.n, d:red.d }, explain:`${n1}/${d1} ${sub ? '−' : '+'} ${n2}/${d2} = ${red.n}/${red.d}.` };
+  },
+  'g5.volume'(t){
+    const l = krRi(2, 3 + t), w = krRi(2, 2 + t), h = krRi(2, 2 + t), ans = l * w * h;
+    return { skill:'g5.volume', grade:5, tier:t, format:'int', unit:'cubic cubits',
+      prompt:`A grain bin is ${l} cubits long, ${w} wide, and ${h} deep. What is its volume, in cubic cubits?`,
+      answer: ans, explain:`${l} × ${w} × ${h} = ${ans}.` };
+  },
+  'g5.pemdas'(t){
+    const a = krRi(2, 9), b = krRi(2, 9), c = krRi(2, 9);
+    const forms = [
+      { p:`${a} + ${b} × ${c}`, v: a + b*c },
+      { p:`${a} × ${b} + ${c}`, v: a*b + c },
+      { p:`(${a} + ${b}) × ${c}`, v: (a+b)*c },
+      { p:`${a*b} ÷ ${b} + ${c}`, v: a + c },
+      { p:`${a} + ${b} × ${c} − ${b}`, v: a + b*c - b }
+    ];
+    const f = krPick(t <= 2 ? forms.slice(0, 3) : forms);
+    return { skill:'g5.pemdas', grade:5, tier:t, format:'int', unit:'barrels',
+      prompt:`The steward reckons ${f.p} barrels. How many barrels? (mind the order of operations)`,
+      answer: f.v, explain:`${f.p} = ${f.v}.` };
+  },
+  'g5.fracofnum'(t){
+    const den = krPick([3,4,5,6,8]), num = krRi(2, den - 1);
+    const total = den * krRi(20, 20 + t*20);
+    const ans = num * total / den, P = krPlace();
+    return { skill:'g5.fracofnum', grade:5, tier:t, format:'int', unit:'marks',
+      prompt:`${num}/${den} of a ${kgrp(total)}-mark tribute goes to the abbey at ${P}. How many marks?`,
+      answer: ans, explain:`${num}/${den} × ${kgrp(total)} = ${kgrp(ans)}.` };
+  },
+  // ===== GRADE 6 =====
+  'g6.ratio'(t){
+    const a = krRi(2, 5), b = krRi(2, 5), parts = a + b;
+    const host = parts * krRi(20, 20 + t*30);
+    const ans = host * a / parts;
+    return { skill:'g6.ratio', grade:6, tier:t, format:'int', unit:'archers',
+      prompt:`The muster is ${a} archers to every ${b} knights. In a host of ${kgrp(host)}, how many are archers?`,
+      answer: ans, explain:`${a}:${b} → ${a}/${parts} are archers → ${kgrp(host)} × ${a}/${parts} = ${kgrp(ans)}.` };
+  },
+  'g6.rate'(t){
+    const per = krRi(6, 10 + t*3), days = krRi(3, 9), tot = per * days;
+    return { skill:'g6.rate', grade:6, tier:t, format:'int', unit:'leagues/day',
+      prompt:`A caravan travels ${kgrp(tot)} leagues in ${days} days. How many leagues per day?`,
+      answer: per, explain:`${kgrp(tot)} ÷ ${days} = ${per}.` };
+  },
+  'g6.percent'(t){
+    const p = krPick(t <= 2 ? [10,20,25,50] : [5,15,30,40,75]);
+    const n = krRi(4, 8 + t*4) * 100;
+    const ans = p * n / 100;
+    return { skill:'g6.percent', grade:6, tier:t, format:'int', unit:'marks',
+      prompt:`The crown claims ${p}% of a ${kgrp(n)}-mark harvest as tithe. How many marks?`,
+      answer: ans, explain:`${p}% of ${kgrp(n)} = ${kgrp(ans)}.` };
+  },
+  'g6.fracmult'(t){
+    const d1 = krRi(2, 6), n1 = krRi(1, d1 - 1), d2 = krRi(2, 6), n2 = krRi(1, d2 - 1);
+    const red = krReduce(n1 * n2, d1 * d2);
+    return { skill:'g6.fracmult', grade:6, tier:t, format:'fraction', unit:'of the guard', tol:0.01,
+      prompt:`Of the guard, ${n1}/${d1} are mounted, and ${n2}/${d2} of those bear lances. What fraction of the whole guard bears lances? (as a fraction)`,
+      answer:{ n:red.n, d:red.d }, explain:`${n1}/${d1} × ${n2}/${d2} = ${red.n}/${red.d}.` };
+  },
+  'g6.fracdiv'(t){
+    const d1 = krRi(2, 4), n1 = krRi(1, d1), d2 = krRi(2, 8);
+    const red = krReduce(n1 * d2, d1);
+    return { skill:'g6.fracdiv', grade:6, tier:t, format:'fraction', unit:'cups', tol:0.01,
+      prompt:`A ${n1}/${d1}-barrel ration is poured into 1/${d2}-barrel cups. How many cups can be filled? (a whole number or fraction)`,
+      answer:{ n:red.n, d:red.d }, explain:`${n1}/${d1} ÷ 1/${d2} = ${n1}/${d1} × ${d2} = ${red.n}${red.d > 1 ? '/' + red.d : ''}.` };
+  },
+  'g6.negatives'(t){
+    const start = -krRi(50, 100 + t*60), add = krRi(80, 120 + t*80);
+    const ans = start + add;
+    return { skill:'g6.negatives', grade:6, tier:t, format:'int', unit:'marks',
+      prompt:`The treasury stands at ${start} marks (a debt); a toll of ${add} marks arrives. What is the new balance? (negative if still in debt)`,
+      answer: ans, explain:`${start} + ${add} = ${ans}.` };
+  },
+  'g6.onestep'(t){
+    const x = krRi(20, 60 + t*30), a = krRi(Math.min(20, x-1), Math.min(200, x-1)), a2 = krRi(2, 9);
+    const forms = [
+      { eq:`x − ${a} = ${x-a}`, ans:x, ex:`x = ${x-a} + ${a} = ${x}`, story:`After paying ${a} marks, the coffer holds ${x-a}. How much did it hold before?` },
+      { eq:`x + ${a} = ${x+a}`, ans:x, ex:`x = ${x+a} − ${a} = ${x}`, story:`After ${a} marks arrive, the coffer holds ${x+a}. How much before?` },
+      { eq:`${a2}x = ${a2*x}`, ans:x, ex:`x = ${a2*x} ÷ ${a2} = ${x}`, story:`${a2} equal carts hold ${a2*x} sacks together. How many sacks per cart?` }
+    ];
+    const f = krPick(t <= 2 ? forms.slice(0, 2) : forms);
+    return { skill:'g6.onestep', grade:6, tier:t, format:'int', unit:'',
+      prompt:`${f.story} (${f.eq})`, answer: f.ans, explain:`${f.eq} → ${f.ex}.` };
+  },
+  // ===== GRADE 7 =====
+  'g7.proportion'(t){
+    const m1 = krRi(3, 6), w1 = krRi(4, 10), k = krRi(2, 4), m2 = m1 * k, ans = w1 * k;
+    return { skill:'g7.proportion', grade:7, tier:t, format:'int', unit:'fathoms',
+      prompt:`If ${m1} masons raise ${w1} fathoms of wall, how many fathoms do ${m2} masons raise at the same pace?`,
+      answer: ans, explain:`${m2} is ${k}× ${m1}, so ${w1} × ${k} = ${ans} fathoms.` };
+  },
+  'g7.taxdiscount'(t){
+    const base = krRi(12, 40) * 10, disc = krPick([10,20,25]), due = krPick([5,10]);
+    const afterD = base * (1 - disc/100);
+    const final = Math.round(afterD * (1 + due/100) * 100) / 100;
+    return { skill:'g7.taxdiscount', grade:7, tier:t, format:'decimal', unit:'marks', tol:0.01,
+      prompt:`A war-horse is marked ${kgrp(base)} marks. The fair gives ${disc}% off, then the crown adds a ${due}% market due. What is the final price?`,
+      answer: final, explain:`${kgrp(base)} − ${disc}% = ${afterD}, then + ${due}% = ${final}.` };
+  },
+  'g7.percentchange'(t){
+    const from = krRi(4, 16) * 100, pct = krPick([10,20,25,50]);
+    const grew = Math.random() < 0.6;
+    const to = grew ? from * (1 + pct/100) : from * (1 - pct/100);
+    const P = krPlace();
+    return { skill:'g7.percentchange', grade:7, tier:t, format:'int', unit:'percent',
+      prompt:`The town of ${P} ${grew ? 'grew' : 'shrank'} from ${kgrp(from)} souls to ${kgrp(to)}. By what percent did it ${grew ? 'grow' : 'shrink'}?`,
+      answer: pct, explain:`a change of ${kgrp(Math.abs(to-from))} on ${kgrp(from)} = ${pct}%.` };
+  },
+  'g7.integerops'(t){
+    const n = t <= 2 ? 4 : 5; const terms = []; let sum = 0;
+    for(let i = 0; i < n; i++){ const v = krRi(-14, 14); terms.push(v); sum += v; }
+    const disp = terms.map(v => (v < 0 ? '−' : '+') + Math.abs(v)).join(', ');
+    return { skill:'g7.integerops', grade:7, tier:t, format:'int', unit:'head',
+      prompt:`Over ${n} hard winters the herd changed by ${disp} head. What is the net change? (negative if the herd shrank)`,
+      answer: sum, explain:`the sum is ${sum}.` };
+  },
+  'g7.twostep'(t){
+    const x = krRi(3, 20 + t*8), a = krRi(2, 9), b = krRi(10, 90), c = a * x + b;
+    return { skill:'g7.twostep', grade:7, tier:t, format:'int', unit:'sacks',
+      prompt:`Each cart carries the same load; ${a} carts plus ${b} loose sacks make ${kgrp(c)} sacks. How many sacks per cart? (${a}x + ${b} = ${kgrp(c)})`,
+      answer: x, explain:`${a}x = ${kgrp(c)} − ${b} = ${kgrp(c-b)}, so x = ${x}.` };
+  },
+  'g7.probability'(t){
+    const red = krRi(2, 6), grey = krRi(2, 6), total = red + grey;
+    const rr = krReduce(red, total), gg = krReduce(grey, total), rg = krReduce(red, grey);
+    const correct = `${rr.n}/${rr.d}`;
+    let opts = [correct, `${gg.n}/${gg.d}`, `${rg.n}/${rg.d}`, `${red}/${grey + total}`];
+    opts = [...new Set(opts)];
+    // guard the padding loop against re-introducing a duplicate (mirrors g4.placeval's indexOf check)
+    let pad = 0;
+    while(opts.length < 4){ const c = `${red}/${total + 1 + opts.length + pad}`; if(opts.indexOf(c) < 0) opts.push(c); else pad++; }
+    opts = opts.slice(0, 4);
+    for(let i = opts.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [opts[i],opts[j]] = [opts[j],opts[i]]; }
+    return { skill:'g7.probability', grade:7, tier:t, format:'mc',
+      prompt:`A quiver holds ${red} red-fletched and ${grey} grey arrows. Drawing blind, what is the chance of red?`,
+      choices: opts, answer: opts.indexOf(correct), explain:`${red} red of ${total} arrows = ${correct}.` };
+  }
+};
+const KR_GRADE_SKILLS = {
+  4:['g4.add','g4.sub','g4.multfact','g4.mult2x2','g4.longdiv','g4.placeval','g4.fracbasic','g4.round'],
+  5:['g5.decadd','g5.decmult','g5.decdiv','g5.fracunlike','g5.volume','g5.pemdas','g5.fracofnum'],
+  6:['g6.ratio','g6.rate','g6.percent','g6.fracmult','g6.fracdiv','g6.negatives','g6.onestep'],
+  7:['g7.proportion','g7.taxdiscount','g7.percentchange','g7.integerops','g7.twostep','g7.probability']
+};
+const KR_SKILL_NAME = {
+  'g4.add':'Coffer-Sums','g4.sub':'Winter Subtraction','g4.multfact':"Bowman's Tables",'g4.mult2x2':'Toll Reckoning','g4.longdiv':'Sharing the Loaves','g4.placeval':"Tithe's Places",'g4.fracbasic':'Muster Fractions','g4.round':'Rounding the Muster',
+  'g5.decadd':"Dyer's Decimals",'g5.decmult':'Candle-Measure','g5.decdiv':"Mason's Shares",'g5.fracunlike':"Miller's Fractions",'g5.volume':'The Grain-Bin','g5.pemdas':"Steward's Order",'g5.fracofnum':"Abbey's Portion",
+  'g6.ratio':'The Muster Ratio','g6.rate':'Caravan-Pace','g6.percent':"Crown's Tithe",'g6.fracmult':'Guard-Fractions','g6.fracdiv':'The Ration-Cups','g6.negatives':'Debts & Credits','g6.onestep':"Coffer's Unknown",
+  'g7.proportion':'The Wall-Raisers','g7.taxdiscount':'Fair & Market Due','g7.percentchange':"Town's Growth",'g7.integerops':"Herd's Winters",'g7.twostep':'The Cart-Loads','g7.probability':'The Blind Draw'
+};
+function krMakeProblem(skill, tier){
+  tier = Math.max(1, Math.min(5, (tier | 0) || 1));
+  const p = KR_GEN[skill](tier);
+  p.tier = tier;
+  return p;
+}
+
+// ---- answer validation (defensive; a correct answer marked wrong is the worst bug) ----
+function krParseNum(s){
+  s = String(s).replace(/−/g, '-').replace(/[,\s]/g, '');
+  s = s.replace(/[^0-9.\-]/g, '');
+  if(s === '' || s === '-' || s === '.' || s === '-.') return NaN;
+  const v = parseFloat(s);
+  return isNaN(v) ? NaN : v;
+}
+function krParseFrac(s){
+  s = String(s).replace(/−/g, '-').trim();
+  // mixed number, e.g. "2 1/2" = 5/2, "-2 1/2" = -5/2 — detect before whitespace is stripped
+  const mm = s.match(/^(-?)(\d+)\s+(\d+)\/(\d+)$/);
+  if(mm){
+    const d = +mm[4]; if(d === 0) return null;
+    const mag = (+mm[2]) * d + (+mm[3]);
+    return { n: (mm[1] === '-' ? -mag : mag), d };
+  }
+  s = s.replace(/[,\s]/g, '');
+  const m = s.match(/^(-?\d+)\/(-?\d+)$/);
+  if(!m) return null;
+  let n = +m[1], d = +m[2];
+  if(d === 0) return null;
+  if(d < 0){ n = -n; d = -d; }
+  return { n, d };
+}
+function krValidate(p, raw){
+  if(!p) return false;
+  const fmt = p.format;
+  if(fmt === 'mc') return raw === p.answer;
+  if(fmt === 'twofield'){
+    let q, r;
+    if(raw && typeof raw === 'object'){ q = krParseNum(raw.q); r = krParseNum(raw.r); }
+    else {
+      const s = String(raw).replace(/−/g, '-').toLowerCase();
+      const m = s.match(/(-?\d+)\s*(?:r|rem|remainder|,)?\s*(-?\d+)/) || s.match(/(-?\d+)/);
+      if(m){ q = parseInt(m[1], 10); r = m[2] != null ? parseInt(m[2], 10) : 0; }
+    }
+    return Number.isFinite(q) && Number.isFinite(r) && q === p.answer.q && r === p.answer.r;
+  }
+  if(fmt === 'fraction'){
+    const fr = krParseFrac(raw);
+    if(fr) return fr.n * p.answer.d === p.answer.n * fr.d;
+    const v = krParseNum(raw);
+    if(isNaN(v)) return false;
+    return Math.abs(v - p.answer.n / p.answer.d) <= (p.tol || 0.01);
+  }
+  if(fmt === 'decimal'){
+    const v = krParseNum(raw);
+    if(isNaN(v)) return false;
+    return Math.abs(v - p.answer) <= (p.tol || 0.001);
+  }
+  const v = krParseNum(raw); // int
+  if(isNaN(v)) return false;
+  return Math.abs(v - p.answer) <= 1e-9;
+}
+function krAnswerText(p){
+  if(!p) return '';
+  if(p.format === 'mc') return p.choices[p.answer];
+  if(p.format === 'twofield') return p.answer.q + ' remainder ' + p.answer.r;
+  if(p.format === 'fraction') return p.answer.d === 1 ? String(p.answer.n) : p.answer.n + '/' + p.answer.d;
+  return String(p.answer);
+}
+/* ----- KR-PURE-END ----- */
+
+// ---- tables ----
+const KR_BASE = [0, 10, 18, 30, 50, 80];            // reward base by tier 1..5
+const KR_FAST = { 4:[12,14,16,20], 5:[14,16,20,26], 6:[16,20,26,34], 7:[18,24,32,45] }; // median-sec promote gate, tier i→i+1
+const KR_RANKS = [
+  { r:1, title:'Apprentice Clerk', seal:'✶', t:0, s:0 },
+  { r:2, title:'Tally-Keeper', seal:'✵', t:40, s:1 },
+  { r:3, title:'Reeve of the Coin', seal:'❖', t:120, s:3 },
+  { r:4, title:'Master of the Mint', seal:'✜', t:300, s:6 },
+  { r:5, title:'Royal Mathematician', seal:'♜', t:600, s:10 },
+  { r:6, title:'Keeper of the Great Reckoning', seal:'☼', t:1000, s:14 },
+  { r:7, title:'Grand Vizier', seal:'♛', t:1800, s:18 }
+];
+function krRankFor(tallies, mastered){ let r = KR_RANKS[0]; for(const k of KR_RANKS){ if(tallies >= k.t && mastered >= k.s) r = k; } return r; }
+function krStreakMult(st){ return st >= 15 ? 2.5 : st >= 10 ? 2.0 : st >= 7 ? 1.75 : st >= 5 ? 1.5 : st >= 3 ? 1.25 : 1.0; }
+function krChestGap(){ return krRi(6, 10); }
+const KR_POWERS = [
+  { id:'bless', name:'Bless the Fields', price:300, rank:2, run(){ runAct('bless'); return true; } },
+  { id:'grant', name:'Enrich the Capital', price:500, rank:3, run(){ const c = W.settlements[0]; c.prosperity = Math.min(1, c.prosperity + 0.15); krChron('crown','The crown’s gold enriched '+c.name+'; its market swells.', c.x, c.z, 3); return true; } },
+  { id:'charter', name:'Charter a Village', price:1500, rank:3, run(){ const c = W.settlements[0]; const a = Math.random()*6.28, r = 700 + Math.random()*500; const ok = foundVillage(W.dayTicked, { x:c.x+Math.cos(a)*r, z:c.z+Math.sin(a)*r, act:true }); if(ok){ W.treasury += 150; return true; } W.treasury += 1500; flash('the surveyors refuse the ground'); return false; } },
+  { id:'watch', name:'Fund the Watch', price:800, rank:4, run(){ W.kr.watchFunded = true; krChron('crown','The watch is funded and provisioned against the next raid.'); return true; } },
+  { id:'rain', name:'Summon the Rains', price:600, rank:5, run(){ if(W.drought){ W.drought = W.dayTicked; krChron('fate','Rain came at the Reckoner’s bidding; the drought breaks.'); return true; } W.treasury += 600; flash('there is no drought to break'); return false; } },
+  { id:'ward', name:'Dragon-Ward', price:2500, rank:6, run(){ if(W.dragon){ W.dragon.sleepUntil = (W.dayTicked||0) + 3000; krChron('myth','Wards are set about the mountain; the dragon sleeps the deeper.', W.peak.x, W.peak.z, 6); } return true; } }
+];
+
+// ---- persistent meta (localStorage) ----
+const KR_SAVE_KEY = 'kingsReckoning.save';
+function krLoadMeta(){
+  let m = null; try{ m = JSON.parse(localStorage.getItem(KR_SAVE_KEY) || 'null'); }catch(e){}
+  if(!m || typeof m !== 'object') m = {};
+  m.grade = m.grade || null; m.rank = m.rank || 1; m.careerTallies = m.careerTallies || 0;
+  m.mastery = m.mastery || {}; m.skillsMastered = m.skillsMastered || []; m.bestKingdom = m.bestKingdom || null;
+  m.decreeStreakDays = m.decreeStreakDays || 0; m.lastPlayed = m.lastPlayed || null; m.relics = m.relics || [];
+  m.settings = m.settings || {}; if(m.settings.sound === undefined) m.settings.sound = true;
+  m.settings.reduceMotion = !!m.settings.reduceMotion; m.settings.gentle = !!m.settings.gentle;
+  return m;
+}
+let krSaveTimer = null;
+function krSaveMeta(now){
+  const doIt = ()=>{ try{ localStorage.setItem(KR_SAVE_KEY, JSON.stringify(KR.meta)); }catch(e){} };
+  if(now){ clearTimeout(krSaveTimer); doIt(); return; }
+  clearTimeout(krSaveTimer); krSaveTimer = setTimeout(doIt, 600);
+}
+
+// ---- WebAudio (lazy, synthesized, muteable) ----
+const KRA = { ctx:null, on:true, master:null };
+function krAudioInit(){
+  if(KRA.ctx) { if(KRA.ctx.state === 'suspended') KRA.ctx.resume(); return; }
+  try{ KRA.ctx = new (window.AudioContext || window.webkitAudioContext)(); KRA.master = KRA.ctx.createGain(); KRA.master.gain.value = 0.22; KRA.master.connect(KRA.ctx.destination); }catch(e){}
+}
+function krBeep(freq, dur, type, gain, when){
+  if(!KRA.ctx || !KRA.on) return;
+  const t = KRA.ctx.currentTime + (when || 0);
+  const o = KRA.ctx.createOscillator(), g = KRA.ctx.createGain();
+  o.type = type || 'sine'; o.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(gain || 0.3, t + 0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(KRA.master); o.start(t); o.stop(t + dur + 0.03);
+}
+function krNoise(dur, gain){
+  if(!KRA.ctx || !KRA.on) return;
+  const t = KRA.ctx.currentTime, n = Math.floor(KRA.ctx.sampleRate * dur);
+  const buf = KRA.ctx.createBuffer(1, n, KRA.ctx.sampleRate), d = buf.getChannelData(0);
+  for(let i = 0; i < n; i++) d[i] = (Math.random()*2 - 1) * (1 - i/n);
+  const src = KRA.ctx.createBufferSource(); src.buffer = buf;
+  const lp = KRA.ctx.createBiquadFilter(); lp.type = 'lowpass';
+  lp.frequency.setValueAtTime(400, t); lp.frequency.linearRampToValueAtTime(1800, t + dur);
+  const g = KRA.ctx.createGain(); g.gain.value = gain || 0.1;
+  src.connect(lp); lp.connect(g); g.connect(KRA.master); src.start(t); src.stop(t + dur);
+}
+function krAudioCorrect(st){ krAudioInit(); krBeep(880,0.09,'sine',0.3); krBeep(1108,0.10,'sine',0.26,0.06); if(st>=5) krBeep(1318,0.10,'triangle',0.18,0.12); }
+function krAudioWrong(){ krAudioInit(); krBeep(330,0.18,'sine',0.16); krBeep(247,0.22,'sine',0.12,0.09); }
+function krAudioArp(){ krAudioInit(); [660,784,988,1175].forEach((f,i)=>krBeep(f,0.12,'triangle',0.16,i*0.08)); }
+function krAudioFanfare(){ krAudioInit(); [523,587,698,784,1047].forEach((f,i)=>krBeep(f,0.16,'triangle',0.18,i*0.1)); }
+function krAudioDrone(){ krAudioInit(); krBeep(110,0.9,'sine',0.12); krBeep(146,0.9,'sine',0.07,0.05); }
+function krAudioTick(){ krAudioInit(); krBeep(1600,0.03,'square',0.1); }
+function krAudioChest(){ krAudioInit(); krNoise(0.18,0.09); krBeep(880,0.09,'sine',0.22,0.12); krBeep(1174,0.1,'sine',0.18,0.18); }
+
+// ---- KR namespace + runtime ----
+const KR = { active:false, meta:null, el:{} };
+function krReduced(){ return KR.meta && KR.meta.settings && KR.meta.settings.reduceMotion; }
+function krEscape(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function krChron(cls, text, x, z, pri){ try{ chron(cls, text, x, z, pri); }catch(e){} }
+function krClock(ms){ const s = Math.max(0, Math.ceil(ms/1000)); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
+function krPraise(){ return krPick(['well reckoned','true to the last penny','the clerks nod','swiftly counted','a clean tally','the coffers thank you']); }
+
+function krInitEconomy(){
+  if(!KR.meta) KR.meta = krLoadMeta();
+  W.kr = {
+    streak:0, best:0, tallies:0, answered:0, sessionGold:0, goldPeak:0,
+    tier:{}, win:{}, grace:{}, lastSkill:null,
+    problem:null, problemAt:0, awaiting:false, goldenToken:false,
+    buff:{ active:false }, decrees:[], decreesDone:false,
+    correctCount:0, chestNext:krChestGap(),
+    crisis:null, lastCrisisEnd:performance.now(), lastRaven:0, ravenPending:false, _ravenGap:110000,
+    watchFunded:false, popPeak:0, goldenAges:0, sessionStart:performance.now(), _nextT:null
+  };
+  const g = KR.meta.grade || 5;
+  (KR_GRADE_SKILLS[g] || []).forEach(s => { W.kr.tier[s] = (KR.meta.mastery[s] >= 75) ? 3 : (KR.meta.mastery[s] >= 40 ? 2 : 1); W.kr.win[s] = []; });
+  krRollDecrees();
+}
+
+function krRollDecrees(){
+  const g = KR.meta.grade || 5, skills = KR_GRADE_SKILLS[g];
+  const pool = [
+    () => ({ key:'tally', text:'Count 12 tallies true', target:12, prog:0 }),
+    () => ({ key:'streak', text:'Hold a streak of 6', target:6, prog:0 }),
+    () => { const s = krPick(skills); return { key:'skill', skill:s, text:'Practise the '+KR_SKILL_NAME[s], target:5, prog:0 }; },
+    () => ({ key:'crisisClean', text:'Turn back a crisis unerring', target:1, prog:0 }),
+    () => ({ key:'gold', text:'Mint 400 marks by hand', target:400, prog:0 }),
+    () => ({ key:'fluency', text:'Reckon 5 tallies swiftly', target:5, prog:0 })
+  ];
+  const idx = [0,1,2,3,4,5];
+  for(let i = idx.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [idx[i],idx[j]] = [idx[j],idx[i]]; }
+  W.kr.decrees = idx.slice(0, 3).map(i => pool[i]());
+  W.kr.decreesDone = false;
+}
+function krBumpDecrees(ev){
+  W.kr.decrees.forEach(d => {
+    if(d.done) return;
+    if(ev.correct){
+      if(d.key === 'tally') d.prog++;
+      else if(d.key === 'streak') d.prog = Math.max(d.prog, ev.streak);
+      else if(d.key === 'skill' && ev.skill === d.skill) d.prog++;
+      else if(d.key === 'gold') d.prog += ev.reward || 0;
+      else if(d.key === 'fluency' && ev.solveMs < 10000) d.prog++;
+    }
+    if(d.prog >= d.target && !d.done){ d.done = true; krDecreeComplete(d); }
+  });
+  krRenderDecrees();
+}
+function krDecreeComplete(d){
+  krChron('crown','A Royal Decree is fulfilled: '+d.text.toLowerCase()+'. The seal is broken and a chest granted.');
+  krPop('📜','Decree Fulfilled', d.text); krAudioFanfare(); krDropChest(3);
+  if(W.kr.decrees.every(x => x.done) && !W.kr.decreesDone){
+    W.kr.decreesDone = true;
+    KR.meta.decreeStreakDays = (KR.meta.decreeStreakDays || 0) + 1;
+    krChron('crown','The crown was well served this day; all decrees are met.');
+    krPop('👑','Crown’s Favor','all decrees fulfilled'); krSaveMeta(true);
+  }
+}
+function krDecreeCrisisClean(){ W.kr.decrees.forEach(d => { if(d.key === 'crisisClean' && !d.done){ d.prog = 1; d.done = true; krDecreeComplete(d); } }); krRenderDecrees(); }
+
+// ---- golden-age economy buffs (apply to real W.rates, linear decay over sim-days) ----
+function krClearBuff(){ const b = W.kr.buff; if(b && b.active){ ['harvest','trade','birth'].forEach(k => { W.rates[k] /= b.applied; }); b.active = false; } }
+function krActivateGolden(mult, days){ krClearBuff(); ['harvest','trade','birth'].forEach(k => { W.rates[k] *= mult; }); W.kr.buff = { active:true, applied:mult, peak:mult, total:days, left:days }; }
+function krBuffDay(){
+  const b = W.kr.buff; if(!b || !b.active) return;
+  b.left--;
+  if(b.left <= 0){ krClearBuff(); return; }
+  const nm = 1 + (b.peak - 1) * (b.left / b.total), ratio = nm / b.applied;
+  ['harvest','trade','birth'].forEach(k => { W.rates[k] *= ratio; }); b.applied = nm;
+}
+
+// ---- problem flow ----
+function krPickSkill(g){
+  const skills = KR_GRADE_SKILLS[g] || KR_GRADE_SKILLS[5];
+  const weights = []; let tot = 0;
+  skills.forEach(s => { const m = KR.meta.mastery[s] || 0; let w = 1 + Math.max(0, (60 - m)) / 25; if(s === W.kr.lastSkill) w *= 0.15; weights.push(w); tot += w; });
+  let r = Math.random() * tot;
+  for(let i = 0; i < skills.length; i++){ r -= weights[i]; if(r <= 0) return skills[i]; }
+  return skills[skills.length - 1];
+}
+function krNext(){
+  if(!W || !W.kr || !KR.active) return;
+  if(W.kr.crisis){ krCrisisNext(); return; }
+  const g = KR.meta.grade || 5, skill = krPickSkill(g), tier = W.kr.tier[skill] || 1;
+  const p = krMakeProblem(skill, tier);
+  W.kr.problem = p; W.kr.problemAt = performance.now(); W.kr.awaiting = true; W.kr.lastSkill = skill;
+  krRenderProblem(p);
+}
+function krGhostLabel(){
+  const st = W.kr.streak;
+  if(st === 4) return '<span class="kghost">One more true — a Festival lights the capital.</span>';
+  if(st === 6) return '<span class="kghost">A Golden Age is but one tally away.</span>';
+  if(st === 9) return '<span class="kghost">One more — and a great Golden Age dawns.</span>';
+  return '';
+}
+function krRenderProblem(p){
+  const el = KR.el;
+  el.prompt.innerHTML = krEscape(p.prompt) + krGhostLabel();
+  el.field.classList.remove('correct','wrong','krShake');
+  el.feedback.textContent = ''; el.feedback.className = '';
+  if(p.format === 'mc'){
+    el.answerRow.style.display = 'none'; el.choices.style.display = 'flex'; el.choices.innerHTML = '';
+    p.choices.forEach((c, i) => {
+      const b = document.createElement('button'); b.className = 'krChip';
+      b.innerHTML = '<span class="kk">' + (i+1) + '</span>' + krEscape(c);
+      b.addEventListener('click', () => { krAudioInit(); krSubmit(i); });
+      el.choices.appendChild(b);
+    });
+  } else {
+    el.choices.style.display = 'none'; el.answerRow.style.display = 'flex';
+    el.input.value = ''; el.input.style.display = ''; el.input2.value = '';
+    if(p.format === 'twofield'){ el.input2.style.display = ''; el.input.placeholder = 'each'; }
+    else { el.input2.style.display = 'none'; el.input.placeholder = '…'; }
+    el.unit.textContent = p.unit || '';
+    // focus synchronously right after render: any async gap lets a typed digit reach the global
+    // speed-hotkey handler before the input is focused. The field is already visible here.
+    try{ el.input.focus(); }catch(e){}
+  }
+}
+function krSubmit(forced){
+  if(!W || !W.kr || !W.kr.awaiting) return;
+  const p = W.kr.problem; if(!p) return;
+  let raw;
+  if(p.format === 'mc') raw = forced;
+  else if(p.format === 'twofield'){ if(KR.el.input.value === '') return; raw = { q:KR.el.input.value, r:KR.el.input2.value }; }
+  else { if(KR.el.input.value === '') return; raw = KR.el.input.value; }
+  const ok = krValidate(p, raw), solveMs = performance.now() - W.kr.problemAt;
+  W.kr.awaiting = false;
+  if(W.kr.crisis){ krCrisisJudge(p, ok, solveMs, forced); return; }
+  if(ok) krOnCorrect(p, solveMs, forced); else krOnWrong(p, solveMs, forced);
+}
+function krScheduleNext(ms){
+  if(W.kr.crisis){ setTimeout(() => { if(W.kr && W.kr.crisis) krCrisisAfter(); }, ms); return; }
+  clearTimeout(W.kr._nextT);
+  W.kr._nextT = setTimeout(() => { if(KR.active && W.kr && !W.kr.crisis) krNext(); }, ms);
+}
+function krOnCorrect(p, solveMs, mcIdx){
+  const kr = W.kr;
+  kr.streak++; kr.best = Math.max(kr.best, kr.streak); kr.tallies++; kr.answered++;
+  KR.meta.careerTallies++;
+  const mult = krStreakMult(kr.streak);
+  const reward = Math.round(KR_BASE[p.tier] * mult * (kr.goldenToken ? 3 : 1));
+  const wasToken = kr.goldenToken; kr.goldenToken = false;
+  W.treasury += reward; kr.sessionGold += reward; kr.goldPeak = Math.max(kr.goldPeak, W.treasury);
+  krFlash('correct'); krCoinBurst(reward); krPulseTreasury(); krAudioCorrect(kr.streak);
+  krSetFeedback('good','✓', '+' + reward + ' marks' + (wasToken ? ' (Golden Answer ×3!)' : '') + ' — ' + krPraise());
+  if(p.format === 'mc') krHighlightChip(mcIdx, true);
+  krMasteryGain(p.skill, p.tier, true);
+  krRecordResult(p.skill, true, solveMs);
+  krCheckStreak();
+  krBumpDecrees({ correct:true, skill:p.skill, streak:kr.streak, solveMs, reward });
+  krRenderStreak();
+  kr.correctCount++;
+  if(kr.correctCount >= kr.chestNext){ kr.chestNext = kr.correctCount + krChestGap(); krDropChest(p.tier); }
+  else if(Math.random() < 1/40) krRareEvent();
+  krCheckRank();
+  if(kr.tallies === 1) krChron('crown','A new Reckoner is come to court, and the first marks are counted true into the coffers.', W.settlements[0].x, W.settlements[0].z, 3);
+  else if(kr.streak > 0 && kr.streak % 10 === 0) krChron('crown','By the Reckoner’s swift hand, ' + fmt(reward) + ' marks were counted true — a streak of ' + kr.streak + '.', W.settlements[0].x, W.settlements[0].z, 3);
+  krSaveMeta();
+  krScheduleNext(750);
+}
+function krOnWrong(p, solveMs, mcIdx){
+  const kr = W.kr;
+  const lostMult = krStreakMult(kr.streak), had = kr.streak;
+  kr.streak = 0; kr.answered++;
+  krFlash('wrong'); krAudioWrong();
+  krSetFeedback('bad','✕', 'The clerk’s tally: ' + krAnswerText(p) + (had >= 3 ? '  (×' + lostMult + ' streak lost)' : ''));
+  KR.el.feedback.innerHTML += '<div style="margin-top:3px">' + krEscape(p.explain || '') + '</div>';
+  if(p.format === 'mc'){ if(typeof mcIdx === 'number') krHighlightChip(mcIdx, false); krHighlightChip(p.answer, true); }
+  krMasteryGain(p.skill, p.tier, false);
+  krRecordResult(p.skill, false, solveMs);
+  krRenderStreak();
+  krBumpDecrees({ correct:false });
+  krSaveMeta();
+  krScheduleNext(2000);
+}
+function krRecordResult(skill, correct, solveMs){
+  const kr = W.kr; if(!kr.win[skill]) kr.win[skill] = [];
+  if(!kr.grace || typeof kr.grace !== 'object') kr.grace = {};
+  const w = kr.win[skill]; w.push({ correct, ms:solveMs }); if(w.length > 5) w.shift();
+  const tier = kr.tier[skill] || 1;
+  const last3 = w.slice(-3), wrong3 = last3.filter(x => !x.correct).length;
+  const twoConsec = w.length >= 2 && !w[w.length-1].correct && !w[w.length-2].correct;
+  if(!correct && (wrong3 >= 2 || twoConsec)){
+    // demotion: set per-skill grace and start a fresh window so the next 3-streak must be earned anew
+    if(tier > 1){ kr.tier[skill] = tier - 1; kr.grace[skill] = true; kr.win[skill] = []; }
+    return;
+  }
+  if(correct){
+    // grace is per-skill: a demoted skill's first correct answer never re-promotes; window resets so the streak is non-overlapping
+    if(kr.grace[skill]){ kr.grace[skill] = false; kr.win[skill] = []; return; }
+    if(last3.length === 3 && last3.every(x => x.correct) && tier < 5){
+      const times = last3.map(x => x.ms).sort((a,b) => a-b), med = times[1];
+      const thr = (KR_FAST[KR.meta.grade || 5] || KR_FAST[5])[tier-1] * 1000;
+      // promotion consumes the window so a fresh, non-overlapping 3-streak is needed for the next tier
+      if(med < thr){ kr.tier[skill] = tier + 1; kr.win[skill] = []; }
+    }
+  }
+}
+function krMasteryGain(skill, tier, correct){
+  const m = KR.meta.mastery, cur = m[skill] || 0;
+  if(correct){
+    const nv = Math.min(100, cur + (3 + tier * 1.5)); m[skill] = nv;
+    if(nv >= 100 && KR.meta.skillsMastered.indexOf(skill) < 0){
+      KR.meta.skillsMastered.push(skill);
+      krChron('crown','The Reckoner is named Master of the ' + KR_SKILL_NAME[skill] + '.', W.settlements[0].x, W.settlements[0].z, 4);
+      krPop('🏅','Mastery!','Master of the ' + KR_SKILL_NAME[skill]); krAudioFanfare(); krDropChest(tier);
+    }
+  } else { const band = Math.floor(cur / 25) * 25; m[skill] = Math.max(band, cur - 4); }
+}
+function krCheckStreak(){
+  const st = W.kr.streak;
+  if(st === 3) krChron('flavor','A banner unfurls over the capital — the Reckoner is on a tally.', W.settlements[0].x, W.settlements[0].z, 2);
+  else if(st === 5) krFestival();
+  else if(st === 7) krGolden(1.15, 30, false);
+  else if(st === 10) krGolden(1.30, 60, true);
+  else if(st === 15){ krPop('👑','Roaring!','the realm gilds itself in your name'); }
+  krGild(st >= 10);
+}
+function krFestival(){
+  const c = W.settlements[0];
+  krChron('realm','A festival is called; lanterns are lit in every window of the capital.', c.x, c.z, 3);
+  krAudioArp(); c.prosperity = Math.min(1, c.prosperity + 0.05);
+}
+function krGolden(mult, days, great){
+  krActivateGolden(mult, days); W.kr.goldenAges++;
+  const c = W.settlements[0];
+  krChron('crown', great
+    ? 'A great Golden Age dawns over ' + W.realmName + ' — fields, roads, and cradles all bloom by the Reckoner’s hand.'
+    : 'A Golden Age begins; harvest and trade quicken across the realm.', c.x, c.z, 5);
+  krPop('☀', great ? 'Great Golden Age' : 'Golden Age', '+' + Math.round((mult-1)*100) + '% harvest · trade · births'); krAudioFanfare();
+}
+function krCheckRank(){
+  const r = krRankFor(KR.meta.careerTallies, KR.meta.skillsMastered.length);
+  if(r.r > KR.meta.rank){
+    KR.meta.rank = r.r;
+    krChron('reign','The Reckoner is raised to ' + r.title + ' by the crown’s own word.', W.settlements[0].x, W.settlements[0].z, 5);
+    krPop(r.seal, 'Rank Up', 'Now ' + r.title); krAudioFanfare(); krSaveMeta(true);
+  }
+  krRenderRank();
+}
+function krDropChest(tier){
+  const roll = Math.random(); let ico = '🎁', t = 'A Chest', s = '', gold = 0;
+  if(roll < 0.5){ gold = KR_BASE[tier] * krRi(3, 8); ico = '💰'; t = 'Bonus Gold'; s = '+' + gold + ' marks'; W.treasury += gold; W.kr.sessionGold += gold; krPulseTreasury(); }
+  else if(roll < 0.72){
+    const g = KR.meta.grade || 5; let weak = null, wm = 101;
+    KR_GRADE_SKILLS[g].forEach(sk => { const m = KR.meta.mastery[sk] || 0; if(m < wm){ wm = m; weak = sk; } });
+    if(weak) KR.meta.mastery[weak] = Math.min(100, (KR.meta.mastery[weak] || 0) + 15);
+    ico = '📈'; t = 'Mastery Surge'; s = '+15 to ' + (weak ? KR_SKILL_NAME[weak] : 'a craft');
+  }
+  else if(roll < 0.9){ W.kr.goldenToken = true; ico = '✨'; t = 'Golden Answer'; s = 'your next tally pays ×3'; }
+  else { if(W.drought){ W.drought = W.dayTicked; ico = '🌧'; t = 'A Blessing'; s = 'the drought breaks'; } else { W.treasury += KR_BASE[tier] * 6; ico = '🕊'; t = 'A Blessing'; s = 'the crown’s favor'; } }
+  krPop(ico, t, s); krAudioChest();
+  krChron('flavor','A reckoner’s chest was opened: ' + t.toLowerCase() + '.');
+  krSaveMeta();
+}
+function krRareEvent(){
+  krChron('myth','An omen crosses the sky, in reward for good reckoning — men take it for a blessing.', W.settlements[0].x, W.settlements[0].z, 6);
+  try{ if(typeof sendComet === 'function') sendComet(W.dayTicked); }catch(e){}
+}
+
+// ---- crisis boss-fights (Plague & Bandits) ----
+function krCrisisSkill(type){
+  const g = KR.meta.grade || 5;
+  const pools = {
+    plague: { 4:['g4.fracbasic','g4.longdiv'], 5:['g5.fracunlike','g5.decadd','g5.fracofnum'], 6:['g6.fracmult','g6.fracdiv','g6.percent'], 7:['g7.percentchange','g7.taxdiscount','g7.proportion'] },
+    bandits:{ 4:['g4.multfact','g4.mult2x2','g4.add'], 5:['g5.decmult','g5.decdiv','g5.pemdas'], 6:['g6.rate','g6.percent','g6.ratio'], 7:['g7.proportion','g7.twostep','g7.integerops'] }
+  };
+  return krPick(pools[type][g] || pools[type][5]);
+}
+function krShowRaven(){
+  const kr = W.kr;
+  let type = Math.random() < 0.5 ? 'plague' : 'bandits';
+  if(type === 'bandits' && kr.watchFunded){ kr.watchFunded = false; type = 'plague'; krChron('crown','The funded Watch scattered masterless men before they could gather.'); }
+  const P = krPlace();
+  kr.ravenPending = { type, place:P };
+  KR.el.ravenT.textContent = type === 'plague' ? 'Plague stirs' : 'Bandits gather';
+  KR.el.ravenB.textContent = type === 'plague'
+    ? 'Sickness rises in ' + P + '. Ride out and reckon the physician’s remedies?'
+    : 'Masterless men mass on the ' + P + ' road. Raise and provision the watch?';
+  KR.el.raven.classList.add('show'); krAudioDrone();
+  kr.lastRaven = performance.now(); kr._ravenGap = krRi(90, 150) * 1000;
+}
+function krDismissRaven(defer){
+  KR.el.raven.classList.remove('show');
+  if(W.kr){ W.kr.ravenPending = false; if(defer){ W.kr.lastRaven = performance.now(); W.kr.lastCrisisEnd = performance.now() - 20000; } }
+}
+function krStartCrisis(type, place){
+  const kr = W.kr; if(!kr) return;
+  KR.el.raven.classList.remove('show'); kr.ravenPending = false;
+  const gentle = KR.meta.settings.gentle ? 1.5 : 1;
+  const cfg = type === 'plague'
+    ? { title:'Stem the Contagion', need:5, seconds:45, per:18, sub:'Reckon the physician’s remedies before the plague spreads.' }
+    : { title:'Raise the Watch', need:6, seconds:40, per:12, sub:'Arm and provision the watch before the raid.' };
+  const town = W.settlements.find(x => x.name === place) || W.settlements[0];
+  kr.crisis = { type, place, title:cfg.title, need:cfg.need, got:0, wrong:0, errors:0,
+    endAt:performance.now() + cfg.seconds*1000*gentle, perMs:cfg.per*1000*gentle, problem:null, probEndAt:0, _lastTick:-1 };
+  kr._prevSpeed = W.clock.speed; setSpeed(0);
+  try{ if(typeof ANNALS !== 'undefined') ANNALS.hold(180000); }catch(e){}
+  kr._crisisTown = town;
+  if(type === 'plague' && town && town.inf < 0.02){ town.inf = 0.03; town.plagueFlag = false; }
+  KR.el.crisis.style.display = 'block';
+  KR.el.crTitle.textContent = cfg.title; KR.el.crSub.textContent = cfg.sub;
+  KR.el.crFill.style.width = '0%';
+  krChron('fate','The Reckoner rode out to meet the peril at ' + place + '.', town.x, town.z, 6);
+  krAudioDrone(); krCrisisNext();
+}
+function krCrisisNext(){
+  const kr = W.kr, c = kr.crisis; if(!c) return;
+  if(c.got >= c.need){ krCrisisResolve(true); return; }
+  const skill = krCrisisSkill(c.type), tier = kr.tier[skill] || 1;
+  const p = krMakeProblem(skill, tier);
+  c.problem = p; kr.problem = p; kr.problemAt = performance.now(); kr.awaiting = true;
+  c.probEndAt = performance.now() + c.perMs;
+  krRenderProblem(p);
+}
+function krCrisisJudge(p, ok, solveMs, mcIdx){
+  const kr = W.kr, c = kr.crisis; if(!c) return;
+  if(ok){
+    c.got++; krFlash('correct'); krAudioCorrect(2);
+    krSetFeedback('good','✓', (c.need - c.got > 0 ? 'Held! ' + (c.need - c.got) + ' to go' : 'The tide turns!'));
+    if(p.format === 'mc') krHighlightChip(mcIdx, true);
+    krMasteryGain(p.skill, p.tier, true);
+    kr.streak++; kr.best = Math.max(kr.best, kr.streak); krRenderStreak();
+    // crisis play must feed the same progression as normal answers (ranks, decrees, adaptive tiers).
+    // c.got already drives the crisis bar and the crisisClean decree — do not touch those here.
+    kr.tallies++; kr.answered++; KR.meta.careerTallies++;
+    krRecordResult(p.skill, true, solveMs);
+    krBumpDecrees({ correct:true, skill:p.skill, streak:kr.streak, solveMs, reward:0 });
+    krCheckRank();
+  } else {
+    c.wrong++; c.errors++; c.endAt -= 4000;
+    krFlash('wrong'); krAudioWrong();
+    krSetFeedback('bad','✕', 'The clerk’s tally: ' + krAnswerText(p));
+    if(p.format === 'mc'){ if(typeof mcIdx === 'number') krHighlightChip(mcIdx, false); krHighlightChip(p.answer, true); }
+    kr.streak = 0; krRenderStreak();
+    kr.answered++;
+    krRecordResult(p.skill, false, solveMs);
+    krBumpDecrees({ correct:false });
+  }
+  krCrisisRenderBar(); krScheduleNext(ok ? 650 : 1400);
+}
+function krCrisisAfter(){ const c = W.kr.crisis; if(!c) return; if(c.got >= c.need){ krCrisisResolve(true); return; } krCrisisNext(); }
+function krCrisisRenderBar(){ const c = W.kr.crisis; if(!c) return; KR.el.crFill.style.width = Math.min(100, Math.round(c.got / c.need * 100)) + '%'; KR.el.crSub.textContent = c.got + ' / ' + c.need + ' reckoned' + (c.errors ? ' · ' + c.errors + ' amiss' : ''); }
+function krCrisisFrame(nowMs){
+  const c = W.kr.crisis; if(!c) return;
+  const left = Math.max(0, c.endAt - nowMs);
+  KR.el.crTime.textContent = krClock(left);
+  const sec = Math.floor(left / 1000);
+  if(left <= 5000 && sec !== c._lastTick){ c._lastTick = sec; krAudioTick(); }
+  if(W.kr.awaiting && nowMs > c.probEndAt){
+    const p = c.problem; W.kr.awaiting = false; c.wrong++; c.errors++; c.endAt -= 3000;
+    krSetFeedback('bad','⌛', 'Too slow — ' + krAnswerText(p)); W.kr.streak = 0; krRenderStreak(); krCrisisRenderBar();
+    krScheduleNext(1200); return;
+  }
+  if(left <= 0) krCrisisResolve(c.got >= Math.ceil(c.need * 0.8));
+}
+function krCrisisResolve(win){
+  const kr = W.kr, c = kr.crisis; if(!c) return;
+  kr.crisis = null; kr.awaiting = false; KR.el.crisis.style.display = 'none';
+  const town = kr._crisisTown || W.settlements[0];
+  if(win){
+    const reward = c.type === 'plague' ? 600 : 400;
+    W.treasury += reward; kr.sessionGold += reward; krPulseTreasury(); krCoinBurst(reward);
+    if(c.type === 'plague' && town){ town.inf = 0; town.plagueFlag = false; }
+    krChron('fate', c.type === 'plague'
+      ? 'The Reckoner stayed the plague at ' + c.place + '; the pyres cooled and the gates reopened. ' + fmt(reward) + ' marks to the coffers.'
+      : 'The Reckoner turned back the raid at ' + c.place + '; the road is safe again. ' + fmt(reward) + ' marks earned.',
+      town.x, town.z, 7);
+    krPop(c.type === 'plague' ? '⚕' : '🛡', 'Crisis Averted', '+' + reward + ' marks'); krAudioFanfare(); krDropChest(3);
+    if(c.errors === 0) krDecreeCrisisClean();
+  } else {
+    if(c.type === 'plague'){ const nb = W.settlements[krRi(0, W.settlements.length - 1)]; try{ if(nb && typeof infect === 'function') infect(nb, W.dayTicked, 'carried on the wind from ' + c.place); }catch(e){} }
+    else { town.prosperity = Math.max(0, town.prosperity - 0.08); town.unrest = Math.min(100, town.unrest + 10); }
+    krChron('fate', c.type === 'plague'
+      ? 'The plague slipped past the Reckoner and spread, though the worst was blunted. ' + c.place + ' will remember it.'
+      : 'The raid struck ' + c.place + ' before the watch could muster; the town is scarred but stands.',
+      town.x, town.z, 6);
+    krPop('🕯', 'The Realm Endures', 'scarred, but not lost');
+  }
+  setSpeed(kr._prevSpeed || 2); kr.lastCrisisEnd = performance.now();
+  krSaveMeta(); krScheduleNext(1600);
+}
+
+// ---- per-frame + per-sim-day hooks ----
+function krFrame(dt, nowMs){
+  const kr = W.kr; if(!kr) return;
+  if(kr.crisis){ krCrisisFrame(nowMs); return; }
+  if(!KR.active) return;
+  const sinceStart = nowMs - kr.sessionStart, sinceCrisis = nowMs - kr.lastCrisisEnd;
+  if(!kr.ravenPending && kr.answered >= 3 && sinceStart > 45000 && sinceCrisis > 40000 && nowMs - kr.lastRaven > kr._ravenGap){
+    krShowRaven();
+  }
+}
+function krSimDay(day){
+  if(!W.kr) return;
+  krBuffDay();
+  W.kr.popPeak = Math.max(W.kr.popPeak || 0, W.realmPop || 0);
+  const peak = Math.max(W.kr.goldPeak || 0, Math.round(W.treasury || 0)), bk = KR.meta.bestKingdom;
+  if(!bk || peak > (bk.treasuryPeak || 0)){
+    KR.meta.bestKingdom = { seed:W.seed, realmName:W.realmName, treasuryPeak:peak, popPeak:Math.round(W.kr.popPeak || 0), goldenAges:W.kr.goldenAges || 0 };
+    krSaveMeta();
+  }
+}
+
+// ---- UI render + effects ----
+function krFlash(kind){ const f = KR.el.field; f.classList.remove('correct','wrong','krShake'); void f.offsetWidth; f.classList.add(kind); if(kind === 'wrong' && !krReduced()) f.classList.add('krShake'); }
+function krSetFeedback(cls, glyph, text){ const f = KR.el.feedback; f.className = cls; f.innerHTML = '<span class="kg">' + glyph + '</span>' + krEscape(text); }
+function krHighlightChip(i, correct){ const chips = KR.el.choices.children; if(chips[i]) chips[i].classList.add(correct ? 'correct' : 'wrong'); }
+function krPop(ico, t, s){ const el = KR.el.pop; KR.el.popIco.textContent = ico; KR.el.popT.textContent = t; KR.el.popS.textContent = s || ''; el.classList.add('show'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 1900); }
+function krGild(on){ KR.el.gild.classList.toggle('on', !!on && !krReduced()); }
+function krPulseTreasury(){ const t = document.getElementById('treasTxt'); if(!t || krReduced() || !t.animate) return; t.animate([{ transform:'scale(1)' }, { transform:'scale(1.18)' }, { transform:'scale(1)' }], { duration:380 }); }
+function krCoinBurst(reward){
+  if(krReduced() || !document.body.animate && !KR.el.field.animate) return;
+  const from = KR.el.field.getBoundingClientRect();
+  const treas = document.getElementById('treasTxt').getBoundingClientRect();
+  const n = 3 + Math.floor(Math.random() * 4);
+  for(let i = 0; i < n; i++){
+    const c = document.createElement('div'); c.className = 'krCoin';
+    const sx = from.left + from.width*0.5 + (Math.random()*40 - 20), sy = from.top + 10;
+    c.style.left = sx + 'px'; c.style.top = sy + 'px'; document.body.appendChild(c);
+    const tx = treas.left + treas.width*0.5, ty = treas.top + treas.height*0.5, delay = i*40;
+    try{
+      c.animate([{ transform:'translate(0,0) scale(1)', opacity:1 }, { transform:'translate(' + (tx-sx) + 'px,' + (ty-sy) + 'px) scale(.5)', opacity:.2 }],
+        { duration:520, delay, easing:'cubic-bezier(.4,0,.5,1)' }).onfinish = () => c.remove();
+    }catch(e){ c.remove(); }
+    setTimeout(() => { if(c.parentNode) c.remove(); }, 720 + delay);
+  }
+}
+function krRenderStreak(){
+  const st = W.kr.streak, f = KR.el.flame;
+  let ico = '🕯', scale = 1, glow = 0;
+  if(st >= 15){ ico = '🔥'; scale = 1.5; glow = 16; } else if(st >= 10){ ico = '🔥'; scale = 1.35; glow = 12; }
+  else if(st >= 7){ ico = '🔥'; scale = 1.2; glow = 8; } else if(st >= 5){ ico = '🔥'; scale = 1.1; glow = 5; }
+  else if(st >= 3){ ico = '🔥'; scale = 1; glow = 2; }
+  f.textContent = ico;
+  if(!krReduced()){ f.style.transform = 'scale(' + scale + ')'; f.style.filter = 'drop-shadow(0 0 ' + glow + 'px rgba(232,85,42,' + (glow ? 0.8 : 0) + '))'; }
+  const m = krStreakMult(st);
+  KR.el.mul.textContent = '×' + (Number.isInteger(m) ? m.toFixed(1) : m);
+  KR.el.streakN.textContent = 'streak ' + st;
+}
+function krRenderRank(){ const r = KR_RANKS.find(x => x.r === KR.meta.rank) || KR_RANKS[0]; KR.el.rankTxt.textContent = r.title; KR.el.seal.textContent = r.seal; }
+function krRenderDecrees(){
+  const el = KR.el.decrees; el.innerHTML = '';
+  W.kr.decrees.forEach(d => {
+    const one = (d.target - d.prog) === 1 && !d.done;
+    const div = document.createElement('div');
+    div.className = 'krSeal' + (d.done ? ' done' : '') + (one ? ' close' : '');
+    const prog = d.done ? '✓' : (d.key === 'gold' ? Math.min(d.prog, d.target) + '/' + d.target : d.prog + '/' + d.target);
+    div.innerHTML = '<span class="kwax">' + (d.done ? '🅆' : '✉') + '</span>' + krEscape(d.text) + ' <b>' + prog + '</b>';
+    el.appendChild(div);
+  });
+}
+function krRenderSettings(){
+  const s = KR.meta.settings;
+  const sb = document.getElementById('krSound'); if(sb){ sb.classList.toggle('on', s.sound !== false); sb.textContent = (s.sound !== false ? '🔊' : '🔇') + ' Sound'; }
+  const mb = document.getElementById('krMotion'); if(mb) mb.classList.toggle('on', !!s.reduceMotion);
+  const gb = document.getElementById('krGentle'); if(gb) gb.classList.toggle('on', !!s.gentle);
+  krRenderStudies();
+}
+function krRenderStudies(){
+  const g = KR.meta.grade || 5, body = KR.el.studiesBody; if(!body) return;
+  let h = '';
+  (KR_GRADE_SKILLS[g] || []).forEach(sk => {
+    const m = Math.round(KR.meta.mastery[sk] || 0);
+    const band = m >= 100 ? 'Master' : m >= 75 ? 'Skilled' : m >= 40 ? 'Practised' : 'Novice';
+    h += '<div class="krMastery"><div class="kml"><b>' + krEscape(KR_SKILL_NAME[sk]) + '</b><span>' + band + ' · ' + m + '</span></div><div class="kmbar"><div style="width:' + m + '%"></div></div></div>';
+  });
+  h += '<div class="krDivider"></div><div class="kml" style="font-variant:small-caps;color:var(--ink);margin-bottom:4px">Royal Powers (spend earned gold)</div>';
+  KR_POWERS.forEach(p => {
+    const locked = KR.meta.rank < p.rank, poor = W && W.treasury < p.price;
+    h += '<div class="drow" style="margin:4px 0;justify-content:space-between"><span style="font-size:12.5px">' + krEscape(p.name) + ' <span style="color:#8a7856">· ' + p.price + '</span></span>' +
+      '<button class="krToggle" data-power="' + p.id + '"' + (locked ? ' disabled title="rank ' + p.rank + '+"' : (poor ? ' title="not gold enough"' : '')) + ' style="min-height:30px;padding:3px 9px' + (locked ? ';opacity:.45' : '') + '">' + (locked ? 'rank ' + p.rank : 'Buy') + '</button></div>';
+  });
+  body.innerHTML = h;
+  body.querySelectorAll('[data-power]').forEach(b => b.addEventListener('click', () => krBuyPower(b.dataset.power)));
+  const car = document.getElementById('krCareer');
+  if(car){ const r = KR_RANKS.find(x => x.r === KR.meta.rank) || KR_RANKS[0];
+    car.textContent = 'Career: ' + KR.meta.careerTallies + ' tallies · ' + KR.meta.skillsMastered.length + ' crafts mastered · ' + r.title +
+      (KR.meta.bestKingdom ? ' · finest reign ' + KR.meta.bestKingdom.realmName + ' (' + fmt(KR.meta.bestKingdom.treasuryPeak || 0) + ' marks)' : ''); }
+}
+function krBuyPower(id){
+  const P = KR_POWERS.find(p => p.id === id); if(!P || !W) return;
+  if(KR.meta.rank < P.rank){ flash('rank too low for that power'); krAudioWrong(); return; }
+  if(W.treasury < P.price){ flash('not gold enough — reckon more'); krAudioWrong(); return; }
+  W.treasury -= P.price;
+  P.run(); krPulseTreasury(); krAudioArp(); krRenderStudies();
+}
+function krToggleStudies(){ KR.el.studies.classList.toggle('show'); if(KR.el.studies.classList.contains('show')) krRenderStudies(); }
+
+// ---- grade select + activation ----
+function krSetGrade(g){
+  KR.meta.grade = g; krSaveMeta(true);
+  KR.el.grade.classList.add('krHidden');
+  document.querySelectorAll('#krGrade .krGradeBtn').forEach(b => b.classList.toggle('on', +b.dataset.g === g));
+  KR.active = true;
+  KR.el.ledger.classList.remove('krHidden');
+  document.getElementById('krToggle').classList.add('on');
+  W.kr.tier = {}; W.kr.win = {}; W.kr.grace = {};
+  KR_GRADE_SKILLS[g].forEach(s => { W.kr.tier[s] = (KR.meta.mastery[s] >= 75) ? 3 : (KR.meta.mastery[s] >= 40 ? 2 : 1); W.kr.win[s] = []; });
+  krRollDecrees(); krRenderDecrees(); krRenderStreak(); krRenderRank();
+  krChron('crown','A new Reckoner takes up the Crown’s ledger. Let the counting begin.', W.settlements[0].x, W.settlements[0].z, 4);
+  krNext();
+}
+KR.toggleLedger = function(){
+  // Never fold the Ledger mid-crisis: the answer UI must stay reachable or the countdown is an unwinnable loss.
+  if(W && W.kr && W.kr.crisis){
+    KR.el.ledger.classList.remove('krHidden');
+    document.getElementById('krToggle').classList.add('on');
+    KR.active = true;
+    return;
+  }
+  if(!KR.meta.grade){ KR.el.grade.classList.remove('krHidden'); return; }
+  const hidden = KR.el.ledger.classList.toggle('krHidden');
+  document.getElementById('krToggle').classList.toggle('on', !hidden);
+  KR.active = !hidden;
+  if(!hidden && W && W.kr && !W.kr.problem && !W.kr.crisis) krNext();
+};
+KR.onWorldReady = function(){
+  if(!W || !W.kr) return;
+  krRenderRank(); krRenderStreak(); krRenderDecrees(); krRenderSettings();
+  if(KR.meta.grade){
+    KR.active = true; KR.el.grade.classList.add('krHidden'); KR.el.ledger.classList.remove('krHidden');
+    document.getElementById('krToggle').classList.add('on');
+    document.querySelectorAll('#krGrade .krGradeBtn').forEach(b => b.classList.toggle('on', +b.dataset.g === KR.meta.grade));
+    krChron('flavor','The realm of ' + W.realmName + ' greets its Reckoner. Solve, and the coffers fill.', W.settlements[0].x, W.settlements[0].z, 2);
+    krNext();
+  } else {
+    KR.active = false; KR.el.ledger.classList.add('krHidden'); KR.el.grade.classList.remove('krHidden');
+    const sub = document.getElementById('krGradeSub');
+    if(sub) sub.textContent = 'The realm of ' + W.realmName + ' has lost its Reckoner. Only you can count the Crown’s gold. Choose your grade band — a parent or teacher may set it, and it will be remembered.';
+  }
+};
+
+function krKeyCapture(e){
+  if(!KR.active || !W || !W.kr) return;
+  if(e.ctrlKey || e.altKey || e.metaKey) return;
+  const p = W.kr.problem;
+  if(p && p.format === 'mc' && W.kr.awaiting){
+    const t = e.target, inField = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA');
+    if(!inField && e.key >= '1' && e.key <= String(p.choices.length)){
+      e.stopImmediatePropagation(); e.preventDefault(); krAudioInit(); krSubmit(parseInt(e.key, 10) - 1);
+    }
+  }
+}
+
+KR.init = function(){
+  const $ = id => document.getElementById(id);
+  KR.el = {
+    ledger:$('ledger'), prompt:$('krPrompt'), field:$('krField'), answerRow:$('krAnswerRow'),
+    input:$('krInput'), input2:$('krInput2'), unit:$('krUnit'), enter:$('krEnter'), choices:$('krChoices'),
+    feedback:$('krFeedback'), decrees:$('krDecrees'), flame:$('krFlame'), mul:$('krMul'), streakN:$('krStreakN'),
+    rankTxt:$('krRankTxt'), seal:$('krSeal'), rankBadge:$('krRankBadge'),
+    crisis:$('krCrisis'), crTitle:$('krcTitle'), crTime:$('krcTime'), crFill:$('krcFill'), crSub:$('krcSub'),
+    raven:$('krRaven'), ravenT:$('krRavenT'), ravenB:$('krRavenB'),
+    pop:$('krPop'), popIco:$('krPopIco'), popT:$('krPopT'), popS:$('krPopS'),
+    gild:$('krGild'), grade:$('krGrade'), studies:$('krStudies'), studiesBody:$('krStudiesBody')
+  };
+  KR.meta = krLoadMeta();
+  KRA.on = KR.meta.settings.sound !== false;
+  document.body.classList.toggle('krReduceMotion', !!KR.meta.settings.reduceMotion || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches));
+  KR.el.enter.addEventListener('click', () => { krAudioInit(); krSubmit(); });
+  KR.el.input.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); krAudioInit(); krSubmit(); } });
+  KR.el.input2.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); krSubmit(); } });
+  ['pointerdown','pointerup','pointermove','wheel','dblclick','touchstart','contextmenu'].forEach(ev => {
+    KR.el.ledger.addEventListener(ev, e => e.stopPropagation());
+    KR.el.crisis.addEventListener(ev, e => e.stopPropagation());
+    KR.el.studies.addEventListener(ev, e => e.stopPropagation());
+  });
+  $('krToggle').addEventListener('click', () => { krAudioInit(); KR.toggleLedger(); });
+  $('krStudiesBtn').addEventListener('click', () => { krAudioInit(); krToggleStudies(); });
+  KR.el.rankBadge.addEventListener('click', krToggleStudies);
+  $('krStudiesX').addEventListener('click', () => KR.el.studies.classList.remove('show'));
+  document.querySelectorAll('#krGrade .krGradeBtn').forEach(b => b.addEventListener('click', () => { krAudioInit(); krSetGrade(+b.dataset.g); }));
+  $('krJustWatch').addEventListener('click', () => { KR.el.grade.classList.add('krHidden'); });
+  $('krChangeGrade').addEventListener('click', () => { KR.el.studies.classList.remove('show'); KR.el.grade.classList.remove('krHidden'); });
+  $('krSound').addEventListener('click', () => { KR.meta.settings.sound = !KR.meta.settings.sound; KRA.on = KR.meta.settings.sound; if(KRA.on) krAudioInit(); krSaveMeta(true); krRenderSettings(); });
+  $('krMotion').addEventListener('click', () => { KR.meta.settings.reduceMotion = !KR.meta.settings.reduceMotion; document.body.classList.toggle('krReduceMotion', KR.meta.settings.reduceMotion); krSaveMeta(true); krRenderSettings(); });
+  $('krGentle').addEventListener('click', () => { KR.meta.settings.gentle = !KR.meta.settings.gentle; krSaveMeta(true); krRenderSettings(); });
+  $('krRavenYes').addEventListener('click', () => { krAudioInit(); const rp = W.kr && W.kr.ravenPending; if(rp) krStartCrisis(rp.type, rp.place); });
+  $('krRavenNo').addEventListener('click', () => krDismissRaven(true));
+  window.addEventListener('keydown', krKeyCapture, true);
+  window.addEventListener('keydown', e => {
+    if(e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+    if(e.ctrlKey || e.altKey || e.metaKey) return;
+    if(e.key.toLowerCase() === 'q'){ krAudioInit(); KR.toggleLedger(); }
+  });
+  krRenderSettings();
+};
+
+// ---- debug hook (mirrors window.ANNALS) ----
+window.RECKONING = {
+  get problem(){ return (W && W.kr) ? W.kr.problem : null; },
+  get answer(){ const p = (W && W.kr) ? W.kr.problem : null; return p ? krAnswerText(p) : null; },
+  get state(){ if(!W || !W.kr) return null; return { grade:KR.meta.grade, active:KR.active, streak:W.kr.streak, tallies:W.kr.tallies, tier:Object.assign({}, W.kr.tier), treasury:Math.round(W.treasury), rank:KR.meta.rank, crisis:W.kr.crisis ? W.kr.crisis.type : null, decrees:W.kr.decrees }; },
+  answerCurrent(){
+    const p = this.problem; if(!p) return 'no problem';
+    if(p.format === 'mc'){ krSubmit(p.answer); return 'mc ' + p.answer; }
+    if(p.format === 'twofield'){ KR.el.input.value = p.answer.q; KR.el.input2.value = p.answer.r; krSubmit(); return p.answer.q + ' R' + p.answer.r; }
+    const v = p.format === 'fraction' ? (p.answer.d === 1 ? String(p.answer.n) : p.answer.n + '/' + p.answer.d) : String(p.answer);
+    KR.el.input.value = v; krSubmit(); return v;
+  },
+  answerWrong(){
+    const p = this.problem; if(!p) return 'no problem';
+    if(p.format === 'mc'){ krSubmit((p.answer + 1) % p.choices.length); return 'wrong mc'; }
+    if(p.format === 'twofield'){ KR.el.input.value = p.answer.q + 1; KR.el.input2.value = p.answer.r; krSubmit(); return 'wrong'; }
+    const v = (typeof p.answer === 'number') ? String(p.answer + 1) : (p.answer && p.answer.n != null ? (p.answer.n + 1) + '/' + p.answer.d : '999999');
+    KR.el.input.value = v; krSubmit(); return 'wrong';
+  },
+  setGrade(g){ if(W && W.kr) krSetGrade(g); return g; },
+  startCrisis(t){ if(W && W.kr) krStartCrisis(t || 'plague', krPlace()); return t; },
+  validate: krValidate, make: krMakeProblem, get meta(){ return KR.meta; }
+};
+
+// ---- wire per-frame + per-sim-day into the existing loop (reassign the mutable bindings) ----
+(function krWireLoop(){
+  const _tickDay = tickDay;
+  tickDay = function(d){ _tickDay(d); try{ if(W && W.kr) krSimDay(d); }catch(e){ console.error('[KR] simDay', e); } };
+  const _tick = tick;
+  tick = function(dt, nowMs){ _tick(dt, nowMs); try{ if(W && W.kr) krFrame(dt, nowMs); }catch(e){ console.error('[KR] frame', e); } };
+})();
+KR.init();
 
 // ---------- boot ----------
 initRenderer();
