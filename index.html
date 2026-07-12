@@ -8029,7 +8029,8 @@ function krBattleEnd(){
   kr.battle = null; kr.awaiting = false; kr.problem = null; clearTimeout(kr._nextT);
   kr.foeCooldown[b.foe.id] = performance.now() + 90000;
   if(b.taken > 0) KR.meta.castle.damage = Math.min(krCastleDefBuilt(), (KR.meta.castle.damage | 0) + b.taken);
-  setSpeed(kr._prevSpeed || 2);
+  setSpeed(kr._prevSpeed == null ? 2 : kr._prevSpeed); // 0 is a legitimate player-chosen pause
+
   KR.el.battleHud.style.display = 'none';
   KR.el.warBoard.style.display = '';
   krSaveMeta(true); krRenderWarBoard(); krSetProblemVisible(false);
@@ -8045,6 +8046,7 @@ function krBattleResolve(win){
         if(foe.id === 'bandits' && W.banditCamps && W.banditCamps.length) removeCamp(W.banditCamps[0]);
         else if(foe.id === 'rats'){ let worst = null; W.settlements.forEach(s => { if(s.inf > (worst ? worst.inf : 0.02)) worst = s; }); if(worst){ worst.inf = 0; worst.plagueFlag = false; } }
         else if(foe.id === 'dragon' && W.dragon){ W.dragon.state = 'homing'; W.dragon.sleepUntil = (W.dayTicked || 0) + 2500; }
+        else if(foe.id === 'host' && W.pol && W.pol.war && typeof endWar === 'function') endWar('crown');
       }
     }catch(e){}
     krChron('fate', foe.win + ' ' + fmt(foe.gold) + ' marks of plunder to the coffers.', town.x, town.z, 7);
@@ -8090,8 +8092,9 @@ function krSetSection(sec){
   if(kr.battle && sec !== 'battle'){ flash('the battle is joined — see it through or sound the retreat'); return; }
   if(kr.section === sec) return;
   kr.section = sec;
+  clearTimeout(kr._nextT); // a pending post-answer reroll must not clobber the section's fresh problem
   if(sec === 'battle' && !kr.battle){
-    clearTimeout(kr._nextT); kr.awaiting = false; kr.problem = null;
+    kr.awaiting = false; kr.problem = null;
     KR.el.feedback.textContent = ''; KR.el.feedback.className = '';
   }
   krSyncSection();
@@ -8212,6 +8215,7 @@ function krToggleStudies(){ KR.el.studies.classList.toggle('show'); if(KR.el.stu
 
 // ---- grade select + activation ----
 function krSetGrade(g){
+  if(W && W.kr && W.kr.battle){ flash('no changing grade bands mid-battle'); KR.el.grade.classList.add('krHidden'); return; }
   KR.meta.grade = g; krSaveMeta(true);
   KR.el.grade.classList.add('krHidden');
   document.querySelectorAll('#krGrade .krGradeBtn').forEach(b => b.classList.toggle('on', +b.dataset.g === g));
@@ -8297,7 +8301,7 @@ KR.init = function(){
   $('krStudiesX').addEventListener('click', () => KR.el.studies.classList.remove('show'));
   document.querySelectorAll('#krGrade .krGradeBtn').forEach(b => b.addEventListener('click', () => { krAudioInit(); krSetGrade(+b.dataset.g); }));
   $('krJustWatch').addEventListener('click', () => { KR.el.grade.classList.add('krHidden'); });
-  $('krChangeGrade').addEventListener('click', () => { KR.el.studies.classList.remove('show'); KR.el.grade.classList.remove('krHidden'); });
+  $('krChangeGrade').addEventListener('click', () => { if(W && W.kr && W.kr.battle){ flash('no changing grade bands mid-battle'); return; } KR.el.studies.classList.remove('show'); KR.el.grade.classList.remove('krHidden'); });
   $('krSound').addEventListener('click', () => { KR.meta.settings.sound = !KR.meta.settings.sound; KRA.on = KR.meta.settings.sound; if(KRA.on) krAudioInit(); krSaveMeta(true); krRenderSettings(); });
   $('krMotion').addEventListener('click', () => { KR.meta.settings.reduceMotion = !KR.meta.settings.reduceMotion; document.body.classList.toggle('krReduceMotion', KR.meta.settings.reduceMotion); krSaveMeta(true); krRenderSettings(); });
   $('krGentle').addEventListener('click', () => { KR.meta.settings.gentle = !KR.meta.settings.gentle; krSaveMeta(true); krRenderSettings(); });
