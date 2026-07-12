@@ -29,10 +29,13 @@ Everything is one HTML file. No build step, no backend, no accounts. Your grade,
 
 ## How math drives the kingdom
 
-- **Gold is minted only by correct answers.** Each right answer pays real gold into the realm's actual treasury — the same number that governs whether villages get chartered and whether the dragon stirs. The free "grant gold" cheat of the base sim is switched off: the Reckoner's only faucet is arithmetic.
+The math panel has **three sections**, switched by tabs at the top of the Ledger: **✒ Ledger**, **🏰 Build**, and **⚔ Battle**.
+
+- **✒ Ledger — gold is minted only by correct answers.** Each right answer pays real gold into the realm's actual treasury — the same number that governs whether villages get chartered and whether the dragon stirs. The free "grant gold" cheat of the base sim is switched off: the Reckoner's only faucet is arithmetic.
 - **Streaks bloom the realm.** Consecutive correct answers grow a streak flame and its gold multiplier. At **5** a Festival lights the capital; at **7** and **10** a **Golden Age** actually buffs the kingdom's harvest, trade, and birth rates for weeks of sim-time. You make the realm prosper by stringing answers true.
-- **Crises are opt-in math boss-fights.** A raven arrives every few minutes offering a fight: **Stem the Contagion** (a fraction/decimal gauntlet that halts a spreading plague) or **Raise the Watch** (a fast multiplication/rate gauntlet that turns back a bandit raid). Beat the countdown and the disaster is averted with a glorious chronicle line and a bag of gold; fall short and the realm is scarred but *never* lost.
-- **Royal Decrees** are three small quests per session (count 12 tallies, hold a streak of 6, master a craft, turn back a crisis unerring…), each with a chest at the end.
+- **🏰 Build — math raises a castle.** Spend earned gold to *commission* walls, watchtowers, a gatehouse, keep storeys, a moat, catapults, and a garrison — then every correct answer lays a stone until the piece rises on the castle diagram. Finished works add **defense** for the Battle section, and some carry perks: each keep storey pays +5% on every tally, the moat weakens attackers, catapults loose a free opening volley. Your castle is *yours* — it persists across realms and sessions. Battle damage shows up as scars you repair the same way: one true answer, one stone.
+- **⚔ Battle — a war-board of turn-based math fights.** Choose a foe (Wolf Pack, Bandit Raiders, the Contagion, a Rival House Host, and — at high rank — the Dragon) and battle turns: a correct answer is a strike against the foe; a wrong answer or a timeout lets it hit your castle's defense. Win and you take plunder, glory in the chronicle, and (if you fought unerring) a chest. Lose and the foe merely withdraws with a little tribute — the realm is scarred but *never* lost. When something *real* stirs in the living sim — an actual bandit camp, a plague town, the waking dragon — that foe turns **urgent** on the war-board (a red dot marks the ⚔ tab), and beating it heals the real realm: the camp is scattered, the town cured, the dragon sent home.
+- **Royal Decrees** are three small quests per session (count 12 tallies, hold a streak of 6, master a craft, win a battle unerring…), each with a chest at the end.
 - **Ranks & Powers.** Lifetime correct tallies and mastered skills raise your Reckoner rank across seven titles (Apprentice Clerk → … → Grand Vizier). Higher ranks unlock **gold-priced Royal Powers** — bless the fields, charter a village, fund the watch, summon the rains, ward the dragon — so the gold you earn has somewhere to go.
 - **Variable rewards.** Roughly one answer in eight drops a chest (bonus gold, a mastery surge, a "Golden Answer" token that triples your next reward, or a blessing); rare answers summon one of the world's own wonders as an omen.
 
@@ -40,7 +43,7 @@ Your best realm (its name and peak treasury) is remembered between sessions as a
 
 ## Controls
 
-The math **Ledger** is keyboard-first and touch-equal. Type your answer and press **Enter** (or tap **Reckon**); multiple-choice problems take keys **1–4** or a tap. The ✒ button (or `Q`) folds the Ledger away; 📜 opens Studies & settings.
+The math **Ledger** is keyboard-first and touch-equal. Type your answer and press **Enter** (or tap **Reckon**); multiple-choice problems take keys **1–4** or a tap. Tabs at the top of the panel switch between **✒ Ledger**, **🏰 Build**, and **⚔ Battle**. The ✒ button (or `Q`) folds the Ledger away (never mid-battle); 📜 opens Studies & settings.
 
 The living world underneath is driven exactly as *The Annals* always was:
 

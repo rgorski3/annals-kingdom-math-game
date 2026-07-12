@@ -237,8 +237,8 @@ body.aiming #app canvas{cursor:crosshair}
   #ledger #krPrompt{font-size:15px}
   #krInput{font-size:19px;width:44%;min-height:46px}
   .krChip{flex:1 1 44%;font-size:15px}
-  #krCrisis{top:calc(112px + env(safe-area-inset-top));width:calc(100vw - 16px)}
-  #krRaven{right:8px;left:8px;width:auto;bottom:calc(78px + env(safe-area-inset-bottom))}
+  #krTabs button{padding:3px 9px;font-size:12px}
+  #krBuildList{max-height:132px}
   #krStudies{left:8px;right:8px;width:auto;bottom:calc(78px + env(safe-area-inset-bottom))}
   #chron:not(.folded) ~ #ledger{opacity:.25}
   .krCard{padding:20px 16px}
@@ -357,26 +357,56 @@ body.aiming #app canvas{cursor:crosshair}
   background:transparent;border:1px solid #8a7a54;border-radius:3px;padding:5px 12px;min-height:36px}
 .krToggle.on{border-color:var(--gold);color:#6b4f10;background:rgba(201,162,39,.15)}
 .krLink{color:#6b4f10;cursor:pointer;text-decoration:underline;font-style:italic;font-size:13px}
-/* crisis bar */
-#krCrisis{position:fixed;top:74px;left:50%;transform:translateX(-50%);z-index:31;width:min(520px,94vw);
-  padding:8px 14px;display:none;background:linear-gradient(175deg,#7a2c22,#5c2018);border:1px solid #3d140e;
-  border-radius:3px;color:#f2e4d0;box-shadow:0 2px 12px rgba(0,0,0,.55)}
-#krCrisis .kch{display:flex;align-items:center;gap:10px;font-variant:small-caps;font-size:14.5px;letter-spacing:.04em}
-#krCrisis .kctime{margin-left:auto;font-size:15px;font-variant:normal;font-feature-settings:"tnum"}
-#krCrisis .kcbar{height:8px;background:rgba(0,0,0,.3);border-radius:4px;margin-top:6px;overflow:hidden}
-#krCrisis .kcbar div{height:100%;width:0;background:linear-gradient(90deg,#c9a227,#f0d878);transition:width .3s}
-#krCrisis .kcsub{font-size:11.5px;font-style:italic;color:#e8d3b8;margin-top:3px}
-/* raven telegraph */
-#krRaven{position:fixed;right:16px;bottom:16px;z-index:32;width:280px;padding:12px 15px;display:none;
-  border:1px solid #3d140e;background:linear-gradient(175deg,#f0e2bc,#e2cf9e)}
-#krRaven .krv-t{font-variant:small-caps;font-size:15px;color:var(--oxblood);margin-bottom:3px}
-#krRaven .krv-b{font-size:13px;color:var(--ink);font-style:italic;line-height:1.4;margin-bottom:9px}
-#krRaven .krv-row{display:flex;gap:8px}
-#krRaven button{font-family:var(--serif);cursor:pointer;flex:1;min-height:40px;font-size:13.5px;font-variant:small-caps;border-radius:3px}
-#krRaven .krv-yes{background:linear-gradient(175deg,#8a3428,#6b241a);color:#f2e4d0;border:1px solid #3d140e}
-#krRaven .krv-no{background:transparent;border:1px solid #8a7a54;color:var(--ink)}
-@keyframes krRavenIn{from{transform:translateX(30px);opacity:0}to{transform:translateX(0);opacity:1}}
-#krRaven.show{display:block;animation:krRavenIn .4s ease-out}
+/* ledger section tabs — Ledger · Build · Battle */
+#krTabs{display:flex;gap:6px;margin:0 0 8px}
+#krTabs button{font-family:var(--serif);font-size:12.5px;font-variant:small-caps;cursor:pointer;color:var(--ink-soft);
+  background:transparent;border:1px solid var(--rule);border-radius:12px;padding:3px 12px;position:relative;min-height:30px}
+#krTabs button.on{color:#6b4f10;border-color:var(--gold);background:rgba(201,162,39,.16)}
+#krWarDot{display:none;position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;
+  background:var(--fire);box-shadow:0 0 6px rgba(232,85,42,.8)}
+#krTabs button.urgent #krWarDot{display:block}
+/* build section — the castle raised by arithmetic */
+#krSecBuild{margin-bottom:8px}
+#krCastleArt{text-align:center;font-size:21px;line-height:1.3;letter-spacing:2px;min-height:30px;margin:2px 0 3px;user-select:none}
+#krCastleArt .kslot{opacity:.22}
+#krCastleArt .kmoat{font-size:14px;letter-spacing:1px;color:#4a6f8a}
+#krDefLine{text-align:center;font-size:12px;font-variant:small-caps;color:#6b4f10;margin-bottom:6px}
+#krBuildList{max-height:170px;overflow-y:auto;padding-right:2px}
+.kbRow{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink);padding:3px 2px;border-top:1px dashed rgba(179,160,117,.45)}
+.kbRow:first-child{border-top:none}
+.kbRow .kbi{font-size:15px;width:20px;text-align:center}
+.kbRow .kbn{flex:1;line-height:1.25}
+.kbRow .kbn .kbsub{display:block;font-size:10.5px;font-style:italic;color:#8a7856}
+.kbRow button{font-family:var(--serif);font-size:11.5px;font-variant:small-caps;cursor:pointer;color:#5c4410;
+  background:linear-gradient(175deg,#f0e2bc,#e2cf9e);border:1px solid var(--gold);border-radius:3px;padding:3px 10px;min-height:28px;white-space:nowrap}
+.kbRow button:disabled{opacity:.5;cursor:default;border-color:var(--rule);background:transparent}
+.kbProg{width:96px}
+.kbProg .kpb{height:7px;background:rgba(120,95,40,.18);border-radius:3px;overflow:hidden}
+.kbProg .kpb div{height:100%;background:linear-gradient(90deg,#8a6f2a,#c9a227);transition:width .3s}
+.kbProg .kpt{font-size:10px;text-align:center;color:#8a7856;font-style:italic}
+/* battle section — the war-board and the fight */
+#krSecBattle{margin-bottom:8px}
+#krWarBoard .kwRow{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:4px 2px;border-top:1px dashed rgba(179,160,117,.45)}
+#krWarBoard .kwRow:first-child{border-top:none}
+#krWarBoard .kwi{font-size:17px;width:22px;text-align:center}
+#krWarBoard .kwn{flex:1;line-height:1.25}
+#krWarBoard .kwn .kwsub{display:block;font-size:10.5px;font-style:italic;color:#8a7856}
+#krWarBoard .kwn .kwurgent{display:block;font-size:10.5px;font-style:italic;color:var(--oxblood)}
+#krWarBoard button{font-family:var(--serif);font-size:11.5px;font-variant:small-caps;cursor:pointer;color:#f2e4d0;
+  background:linear-gradient(175deg,#8a3428,#6b241a);border:1px solid #3d140e;border-radius:3px;padding:3px 10px;min-height:28px;white-space:nowrap}
+#krWarBoard button:disabled{opacity:.5;cursor:default;color:var(--ink-soft);background:transparent;border-color:var(--rule)}
+#krBattleHud .kbFoeLine{display:flex;align-items:center;gap:8px;font-size:13.5px;font-variant:small-caps;color:var(--ink)}
+#krBattleHud .kbFoeLine .kfi{font-size:20px}
+#krBattleHud .kbflee{margin-left:auto;font-family:var(--serif);font-size:10.5px;font-variant:small-caps;cursor:pointer;
+  color:var(--ink-soft);background:transparent;border:1px solid #8a7a54;border-radius:3px;padding:2px 8px;min-height:26px}
+.kbBar{height:9px;background:rgba(0,0,0,.14);border:1px solid rgba(61,20,14,.35);border-radius:4px;overflow:hidden;flex:1}
+.kbBar div{height:100%;background:linear-gradient(90deg,#8a3428,#c0502f);transition:width .3s}
+.kbBar.you div{background:linear-gradient(90deg,#8a6f2a,#c9a227)}
+.kbBarRow{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:11px;color:var(--ink-soft)}
+.kbBarRow .kbl{width:70px;font-variant:small-caps;white-space:nowrap}
+.kbBarRow .kbv{width:38px;text-align:right;font-feature-settings:"tnum"}
+#kbTimer{height:5px;background:rgba(120,95,40,.15);border-radius:3px;overflow:hidden;margin:2px 0 4px}
+#kbTimer div{height:100%;width:100%;background:linear-gradient(90deg,#c9a227,#e8552a)}
 /* chest / reward pop */
 #krPop{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%) scale(.6);z-index:55;
   padding:20px 30px;text-align:center;display:none;opacity:0;transition:opacity .3s, transform .3s;pointer-events:none;min-width:220px}
@@ -535,11 +565,6 @@ body.krReduceMotion .krField.wrong.krShake #krInput{animation:none!important}
      THE KING'S RECKONING — math game layer (DOM)
      ====================================================================== -->
 <div id="krGild"></div>
-<div id="krCrisis" class="parch">
-  <div class="kch"><span id="krcTitle">A crisis stirs</span><span class="kctime" id="krcTime">0:45</span></div>
-  <div class="kcbar"><div id="krcFill"></div></div>
-  <div class="kcsub" id="krcSub"></div>
-</div>
 <div id="ledger" class="parch krHidden">
   <div class="krTop">
     <div id="krStreak" title="Answer streak — string them true for Festivals and Golden Ages">
@@ -549,6 +574,25 @@ body.krReduceMotion .krField.wrong.krShake #krInput{animation:none!important}
     <span class="sp"></span>
     <div id="krRankBadge" title="Your Reckoner rank — open Studies">
       <span class="kseal" id="krSeal">✶</span><span class="krank" id="krRankTxt">Apprentice Clerk</span>
+    </div>
+  </div>
+  <div id="krTabs">
+    <button data-sec="ledger" class="on" title="The day's reckoning — every true answer mints gold">✒ Ledger</button>
+    <button data-sec="build" title="Raise a castle and its defenses with mathematics">🏰 Build</button>
+    <button data-sec="battle" title="Meet the realm's foes on the war-board">⚔ Battle<span id="krWarDot"></span></button>
+  </div>
+  <div id="krSecBuild" style="display:none">
+    <div id="krCastleArt"></div>
+    <div id="krDefLine"></div>
+    <div id="krBuildList"></div>
+  </div>
+  <div id="krSecBattle" style="display:none">
+    <div id="krWarBoard"></div>
+    <div id="krBattleHud" style="display:none">
+      <div class="kbFoeLine"><span class="kfi" id="kbFoeIco">🐺</span><span id="kbFoeName"></span><button class="kbflee" id="kbFlee">Sound the retreat</button></div>
+      <div class="kbBarRow"><span class="kbl">the foe</span><div class="kbBar"><div id="kbFoeHP"></div></div><span class="kbv" id="kbFoeV"></span></div>
+      <div class="kbBarRow"><span class="kbl">🏰 defense</span><div class="kbBar you"><div id="kbDefHP"></div></div><span class="kbv" id="kbDefV"></span></div>
+      <div id="kbTimer"><div id="kbTimerFill"></div></div>
     </div>
   </div>
   <div id="krPrompt">The realm awaits its Reckoner.</div>
@@ -563,11 +607,6 @@ body.krReduceMotion .krField.wrong.krShake #krInput{animation:none!important}
   </div>
   <div id="krFeedback"></div>
   <div id="krDecrees"></div>
-</div>
-<div id="krRaven" class="parch">
-  <div class="krv-t" id="krRavenT">A raven comes</div>
-  <div class="krv-b" id="krRavenB"></div>
-  <div class="krv-row"><button class="krv-yes" id="krRavenYes">Reckon</button><button class="krv-no" id="krRavenNo">Not yet</button></div>
 </div>
 <div id="krPop" class="parch"><div class="kp-ico" id="krPopIco">✦</div><div class="kp-t" id="krPopT"></div><div class="kp-s" id="krPopS"></div></div>
 <div id="krStudies" class="parch">
@@ -7416,7 +7455,7 @@ const KR_POWERS = [
   { id:'bless', name:'Bless the Fields', price:300, rank:2, run(){ runAct('bless'); return true; } },
   { id:'grant', name:'Enrich the Capital', price:500, rank:3, run(){ const c = W.settlements[0]; c.prosperity = Math.min(1, c.prosperity + 0.15); krChron('crown','The crown’s gold enriched '+c.name+'; its market swells.', c.x, c.z, 3); return true; } },
   { id:'charter', name:'Charter a Village', price:1500, rank:3, run(){ const c = W.settlements[0]; const a = Math.random()*6.28, r = 700 + Math.random()*500; const ok = foundVillage(W.dayTicked, { x:c.x+Math.cos(a)*r, z:c.z+Math.sin(a)*r, act:true }); if(ok){ W.treasury += 150; return true; } W.treasury += 1500; flash('the surveyors refuse the ground'); return false; } },
-  { id:'watch', name:'Fund the Watch', price:800, rank:4, run(){ W.kr.watchFunded = true; krChron('crown','The watch is funded and provisioned against the next raid.'); return true; } },
+  { id:'watch', name:'Fund the Watch', price:800, rank:4, run(){ W.kr.watchFunded = true; krChron('crown','The watch is funded; they will bear the first blow in the Reckoner’s next battle.'); return true; } },
   { id:'rain', name:'Summon the Rains', price:600, rank:5, run(){ if(W.drought){ W.drought = W.dayTicked; krChron('fate','Rain came at the Reckoner’s bidding; the drought breaks.'); return true; } W.treasury += 600; flash('there is no drought to break'); return false; } },
   { id:'ward', name:'Dragon-Ward', price:2500, rank:6, run(){ if(W.dragon){ W.dragon.sleepUntil = (W.dayTicked||0) + 3000; krChron('myth','Wards are set about the mountain; the dragon sleeps the deeper.', W.peak.x, W.peak.z, 6); } return true; } }
 ];
@@ -7429,6 +7468,8 @@ function krLoadMeta(){
   m.grade = m.grade || null; m.rank = m.rank || 1; m.careerTallies = m.careerTallies || 0;
   m.mastery = m.mastery || {}; m.skillsMastered = m.skillsMastered || []; m.bestKingdom = m.bestKingdom || null;
   m.decreeStreakDays = m.decreeStreakDays || 0; m.lastPlayed = m.lastPlayed || null; m.relics = m.relics || [];
+  m.castle = (m.castle && typeof m.castle === 'object') ? m.castle : {};
+  m.castle.built = m.castle.built || {}; m.castle.damage = m.castle.damage | 0; m.castle.order = m.castle.order || null;
   m.settings = m.settings || {}; if(m.settings.sound === undefined) m.settings.sound = true;
   m.settings.reduceMotion = !!m.settings.reduceMotion; m.settings.gentle = !!m.settings.gentle;
   return m;
@@ -7491,7 +7532,7 @@ function krInitEconomy(){
     problem:null, problemAt:0, awaiting:false, goldenToken:false,
     buff:{ active:false }, decrees:[], decreesDone:false,
     correctCount:0, chestNext:krChestGap(),
-    crisis:null, lastCrisisEnd:performance.now(), lastRaven:0, ravenPending:false, _ravenGap:110000,
+    section:'ledger', battle:null, foeCooldown:{},
     watchFunded:false, popPeak:0, goldenAges:0, sessionStart:performance.now(), _nextT:null
   };
   const g = KR.meta.grade || 5;
@@ -7505,7 +7546,7 @@ function krRollDecrees(){
     () => ({ key:'tally', text:'Count 12 tallies true', target:12, prog:0 }),
     () => ({ key:'streak', text:'Hold a streak of 6', target:6, prog:0 }),
     () => { const s = krPick(skills); return { key:'skill', skill:s, text:'Practise the '+KR_SKILL_NAME[s], target:5, prog:0 }; },
-    () => ({ key:'crisisClean', text:'Turn back a crisis unerring', target:1, prog:0 }),
+    () => ({ key:'battleClean', text:'Win a battle unerring', target:1, prog:0 }),
     () => ({ key:'gold', text:'Mint 400 marks by hand', target:400, prog:0 }),
     () => ({ key:'fluency', text:'Reckon 5 tallies swiftly', target:5, prog:0 })
   ];
@@ -7538,7 +7579,7 @@ function krDecreeComplete(d){
     krPop('👑','Crown’s Favor','all decrees fulfilled'); krSaveMeta(true);
   }
 }
-function krDecreeCrisisClean(){ W.kr.decrees.forEach(d => { if(d.key === 'crisisClean' && !d.done){ d.prog = 1; d.done = true; krDecreeComplete(d); } }); krRenderDecrees(); }
+function krDecreeBattleClean(){ W.kr.decrees.forEach(d => { if(d.key === 'battleClean' && !d.done){ d.prog = 1; d.done = true; krDecreeComplete(d); } }); krRenderDecrees(); }
 
 // ---- golden-age economy buffs (apply to real W.rates, linear decay over sim-days) ----
 function krClearBuff(){ const b = W.kr.buff; if(b && b.active){ ['harvest','trade','birth'].forEach(k => { W.rates[k] /= b.applied; }); b.active = false; } }
@@ -7562,7 +7603,8 @@ function krPickSkill(g){
 }
 function krNext(){
   if(!W || !W.kr || !KR.active) return;
-  if(W.kr.crisis){ krCrisisNext(); return; }
+  if(W.kr.battle){ krBattleNext(); return; }
+  if(W.kr.section === 'battle') return; // battle-idle shows the war-board, not problems
   const g = KR.meta.grade || 5, skill = krPickSkill(g), tier = W.kr.tier[skill] || 1;
   const p = krMakeProblem(skill, tier);
   W.kr.problem = p; W.kr.problemAt = performance.now(); W.kr.awaiting = true; W.kr.lastSkill = skill;
@@ -7608,24 +7650,29 @@ function krSubmit(forced){
   else { if(KR.el.input.value === '') return; raw = KR.el.input.value; }
   const ok = krValidate(p, raw), solveMs = performance.now() - W.kr.problemAt;
   W.kr.awaiting = false;
-  if(W.kr.crisis){ krCrisisJudge(p, ok, solveMs, forced); return; }
+  if(W.kr.battle){ krBattleJudge(p, ok, solveMs, forced); return; }
   if(ok) krOnCorrect(p, solveMs, forced); else krOnWrong(p, solveMs, forced);
 }
 function krScheduleNext(ms){
-  if(W.kr.crisis){ setTimeout(() => { if(W.kr && W.kr.crisis) krCrisisAfter(); }, ms); return; }
   clearTimeout(W.kr._nextT);
-  W.kr._nextT = setTimeout(() => { if(KR.active && W.kr && !W.kr.crisis) krNext(); }, ms);
+  W.kr._nextT = setTimeout(() => { if(KR.active && W.kr) krNext(); }, ms);
 }
 function krOnCorrect(p, solveMs, mcIdx){
   const kr = W.kr;
   kr.streak++; kr.best = Math.max(kr.best, kr.streak); kr.tallies++; kr.answered++;
   KR.meta.careerTallies++;
   const mult = krStreakMult(kr.streak);
-  const reward = Math.round(KR_BASE[p.tier] * mult * (kr.goldenToken ? 3 : 1));
+  const keepBonus = 1 + 0.05 * krBuilt('keep'); // each keep storey pays +5% on every tally
+  let reward = Math.round(KR_BASE[p.tier] * mult * keepBonus * (kr.goldenToken ? 3 : 1));
   const wasToken = kr.goldenToken; kr.goldenToken = false;
+  let buildNote = '';
+  if(kr.section === 'build' && KR.meta.castle.order){
+    reward = Math.max(1, Math.round(reward / 2)); // half the mint goes to the masons
+    buildNote = krBuildStone();
+  }
   W.treasury += reward; kr.sessionGold += reward; kr.goldPeak = Math.max(kr.goldPeak, W.treasury);
   krFlash('correct'); krCoinBurst(reward); krPulseTreasury(); krAudioCorrect(kr.streak);
-  krSetFeedback('good','✓', '+' + reward + ' marks' + (wasToken ? ' (Golden Answer ×3!)' : '') + ' — ' + krPraise());
+  krSetFeedback('good','✓', '+' + reward + ' marks' + (wasToken ? ' (Golden Answer ×3!)' : '') + (buildNote || (' — ' + krPraise())));
   if(p.format === 'mc') krHighlightChip(mcIdx, true);
   krMasteryGain(p.skill, p.tier, true);
   krRecordResult(p.skill, true, solveMs);
@@ -7741,137 +7788,330 @@ function krRareEvent(){
   try{ if(typeof sendComet === 'function') sendComet(W.dayTicked); }catch(e){}
 }
 
-// ---- crisis boss-fights (Plague & Bandits) ----
-function krCrisisSkill(type){
-  const g = KR.meta.grade || 5;
-  const pools = {
-    plague: { 4:['g4.fracbasic','g4.longdiv'], 5:['g5.fracunlike','g5.decadd','g5.fracofnum'], 6:['g6.fracmult','g6.fracdiv','g6.percent'], 7:['g7.percentchange','g7.taxdiscount','g7.proportion'] },
-    bandits:{ 4:['g4.multfact','g4.mult2x2','g4.add'], 5:['g5.decmult','g5.decdiv','g5.pemdas'], 6:['g6.rate','g6.percent','g6.ratio'], 7:['g7.proportion','g7.twostep','g7.integerops'] }
-  };
-  return krPick(pools[type][g] || pools[type][5]);
+// ---- 🏰 BUILD: the castle, raised stone by stone with arithmetic ----
+const KR_CASTLE = [
+  { id:'wall',  name:'Curtain Wall', ico:'🧱', max:4, cost:100, stones:5,  def:2, blurb:'stone shoulders for the town' },
+  { id:'tower', name:'Watchtower',  ico:'🗼', max:4, cost:150, stones:6,  def:2, req:{ wall:1 }, blurb:'eyes on every road' },
+  { id:'gate',  name:'Gatehouse',   ico:'🚪', max:1, cost:200, stones:8,  def:3, req:{ wall:2 }, blurb:'oak, iron, and a portcullis' },
+  { id:'keep',  name:'Keep Storey', ico:'🏰', max:3, cost:300, stones:10, def:3, req:{ gate:1 }, blurb:'each storey pays +5% on every tally' },
+  { id:'moat',  name:'Moat',        ico:'🌊', max:1, cost:250, stones:10, def:4, blurb:'foes arrive tired and wet (−1 to their strength)' },
+  { id:'cata',  name:'Catapult',    ico:'🪨', max:2, cost:400, stones:12, def:0, req:{ tower:1 }, blurb:'looses a first volley when battle is joined' },
+  { id:'garr',  name:'Garrison',    ico:'🛡', max:5, cost:100, stones:4,  def:1, blurb:'spears behind the wall' }
+];
+function krBuilt(id){ return (KR.meta && KR.meta.castle && KR.meta.castle.built[id]) | 0; }
+function krCastleDefBuilt(){ let d = 0; KR_CASTLE.forEach(c => { d += c.def * krBuilt(c.id); }); return d; }
+function krDefenseTotal(){ return 3 + Math.max(0, krCastleDefBuilt() - (KR.meta.castle.damage | 0)); }
+function krCanBuild(c){
+  if(krBuilt(c.id) >= c.max) return { no:'built' };
+  if(c.req) for(const k in c.req) if(krBuilt(k) < c.req[k]){
+    const rc = KR_CASTLE.find(x => x.id === k);
+    return { no:'needs ' + c.req[k] + ' ' + (rc ? rc.name.toLowerCase() : k) + (c.req[k] > 1 ? 's' : '') };
+  }
+  if(W.treasury < c.cost) return { no:'not gold enough' };
+  return {};
 }
-function krShowRaven(){
-  const kr = W.kr;
-  let type = Math.random() < 0.5 ? 'plague' : 'bandits';
-  if(type === 'bandits' && kr.watchFunded){ kr.watchFunded = false; type = 'plague'; krChron('crown','The funded Watch scattered masterless men before they could gather.'); }
-  const P = krPlace();
-  kr.ravenPending = { type, place:P };
-  KR.el.ravenT.textContent = type === 'plague' ? 'Plague stirs' : 'Bandits gather';
-  KR.el.ravenB.textContent = type === 'plague'
-    ? 'Sickness rises in ' + P + '. Ride out and reckon the physician’s remedies?'
-    : 'Masterless men mass on the ' + P + ' road. Raise and provision the watch?';
-  KR.el.raven.classList.add('show'); krAudioDrone();
-  kr.lastRaven = performance.now(); kr._ravenGap = krRi(90, 150) * 1000;
+function krCommission(id){
+  const cas = KR.meta.castle;
+  if(cas.order){ flash('the masons are already at work'); krAudioWrong(); return; }
+  if(id === '_repair'){
+    if(!cas.damage) return;
+    cas.order = { id:'_repair', got:0, need:Math.min(cas.damage, 8) };
+    krChron('realm','Masons are set to mending the battle-scarred walls.');
+  } else {
+    const c = KR_CASTLE.find(x => x.id === id); if(!c) return;
+    const bad = krCanBuild(c); if(bad.no){ flash(bad.no); krAudioWrong(); return; }
+    W.treasury -= c.cost; krPulseTreasury();
+    cas.order = { id, got:0, need:c.stones };
+    krChron('realm','The Reckoner commissions a ' + c.name.toLowerCase() + '; the masons await true arithmetic.');
+  }
+  krAudioArp(); krSaveMeta(); krRenderBuild();
 }
-function krDismissRaven(defer){
-  KR.el.raven.classList.remove('show');
-  if(W.kr){ W.kr.ravenPending = false; if(defer){ W.kr.lastRaven = performance.now(); W.kr.lastCrisisEnd = performance.now() - 20000; } }
+// one correct answer (in the Build section) = one stone laid on the active work order
+function krBuildStone(){
+  const cas = KR.meta.castle, o = cas.order; if(!o) return '';
+  o.got++;
+  if(o.id === '_repair' && cas.damage > 0) cas.damage--;
+  if(o.got >= o.need){
+    cas.order = null;
+    if(o.id === '_repair'){
+      krPop('🔧','Walls Mended','the scars are stone once more'); krAudioFanfare();
+      krChron('realm','The walls stand whole again, mended by the Reckoner’s masons.');
+    } else {
+      const c = KR_CASTLE.find(x => x.id === o.id);
+      cas.built[o.id] = krBuilt(o.id) + 1;
+      krPop(c.ico, c.name + ' Raised', c.def ? '+' + c.def + ' defense' : c.blurb); krAudioFanfare();
+      krChron('realm','The ' + c.name.toLowerCase() + ' of ' + (W.realmName || 'the realm') + ' is raised, stone on stone, by the Reckoner’s arithmetic.', W.settlements[0].x, W.settlements[0].z, 4);
+    }
+    krSaveMeta(true); krRenderBuild();
+    return ' — the work is done!';
+  }
+  krSaveMeta(); krRenderBuild();
+  return ' — ' + (o.id === '_repair' ? 'a scar mended' : 'a stone laid') + ', ' + o.got + '/' + o.need;
 }
-function krStartCrisis(type, place){
-  const kr = W.kr; if(!kr) return;
-  KR.el.raven.classList.remove('show'); kr.ravenPending = false;
+function krRenderCastleArt(){
+  const b = krBuilt, g = (on, ico) => on ? ico : '<span class="kslot">' + ico + '</span>';
+  const top = g(b('cata') >= 1, '🪨') + ' ' + g(b('keep') >= 1, '🏰') + g(b('keep') >= 2, '🏰') + g(b('keep') >= 3, '🏰') + ' ' + g(b('cata') >= 2, '🪨');
+  const wallRow = g(b('tower') >= 1, '🗼') + g(b('wall') >= 1, '🧱') + g(b('tower') >= 3, '🗼') + g(b('wall') >= 2, '🧱') +
+    g(b('gate') >= 1, '🚪') + g(b('wall') >= 3, '🧱') + g(b('tower') >= 4, '🗼') + g(b('wall') >= 4, '🧱') + g(b('tower') >= 2, '🗼');
+  let garr = ''; for(let i = 0; i < 5; i++) garr += g(b('garr') > i, '🛡');
+  const moat = '<span class="kmoat">' + g(!!b('moat'), '≈≈≈≈≈≈≈≈≈≈≈') + '</span>';
+  KR.el.castleArt.innerHTML = '<div>' + top + '</div><div>' + wallRow + '</div><div style="font-size:15px">' + garr + '</div><div>' + moat + '</div>';
+}
+function krRenderBuild(){
+  if(!KR.el.buildList) return;
+  krRenderCastleArt();
+  const cas = KR.meta.castle;
+  KR.el.defLine.innerHTML = '🛡 defense ' + krDefenseTotal() +
+    (cas.damage ? ' <span style="color:var(--oxblood)">· ' + cas.damage + ' battle-scar' + (cas.damage === 1 ? '' : 's') + '</span>' : '');
+  const orderRow = () => '<span class="kbProg"><div class="kpb"><div style="width:' + Math.round(cas.order.got / cas.order.need * 100) + '%"></div></div><div class="kpt">' + cas.order.got + '/' + cas.order.need + ' · answer to build</div></span>';
+  let h = '';
+  KR_CASTLE.forEach(c => {
+    const n = krBuilt(c.id), active = cas.order && cas.order.id === c.id;
+    h += '<div class="kbRow"><span class="kbi">' + c.ico + '</span><span class="kbn">' + c.name +
+      ' <span style="color:#8a7856">' + n + '/' + c.max + (c.def ? ' · +' + c.def + '🛡' : '') + '</span><span class="kbsub">' + krEscape(c.blurb) + '</span></span>';
+    if(active) h += orderRow();
+    else {
+      const bad = krCanBuild(c);
+      if(bad.no === 'built') h += '<button disabled>built</button>';
+      else if(bad.no === 'not gold enough') h += '<button disabled title="not gold enough — reckon more">' + c.cost + ' ⛁</button>';
+      else if(bad.no) h += '<button disabled title="' + krEscape(bad.no) + '">🔒 ' + krEscape(bad.no) + '</button>';
+      else h += '<button data-build="' + c.id + '"' + (cas.order ? ' disabled title="one work at a time"' : '') + '>' + c.cost + ' ⛁</button>';
+    }
+    h += '</div>';
+  });
+  if(cas.damage || (cas.order && cas.order.id === '_repair')){
+    const active = cas.order && cas.order.id === '_repair';
+    h += '<div class="kbRow"><span class="kbi">🔧</span><span class="kbn">Repairs <span class="kbsub">mend the battle-scars; each true answer heals one</span></span>' +
+      (active ? orderRow() : '<button data-build="_repair"' + (cas.order ? ' disabled title="one work at a time"' : '') + '>free</button>') + '</div>';
+  }
+  KR.el.buildList.innerHTML = h;
+  KR.el.buildList.querySelectorAll('[data-build]').forEach(b => b.addEventListener('click', () => { krAudioInit(); krCommission(b.dataset.build); }));
+}
+
+// ---- ⚔ BATTLE: the war-board — turn-based fights where answers are strikes ----
+const KR_FOES = [
+  { id:'wolves', name:'Wolf Pack', ico:'🐺', hp:4, time:22, gold:150, rank:1, pool:'field',
+    blurb:'grey shapes circle the folds', win:'The wolves are driven back to the high snows.', lose:'The wolves take their toll of the flocks.' },
+  { id:'bandits', name:'Bandit Raiders', ico:'🗡', hp:6, time:16, gold:300, rank:1, pool:'field',
+    blurb:'masterless men on the roads', win:'The raiders are scattered and the roads run safe.', lose:'The raiders slip away laden with tribute.' },
+  { id:'rats', name:'The Contagion', ico:'🐀', hp:7, time:18, gold:450, rank:2, pool:'physic',
+    blurb:'sickness rides the wind', win:'The contagion is stemmed; the pyres cool.', lose:'The sickness spreads before the remedies are reckoned.' },
+  { id:'host', name:'Rival House Host', ico:'⚔', hp:9, time:15, gold:700, rank:3, pool:'war',
+    blurb:'a jealous banner marches', win:'The rival host breaks before the walls.', lose:'The host withdraws with wagons of tribute.' },
+  { id:'dragon', name:'The Dragon', ico:'🐉', hp:12, time:14, gold:1500, rank:5, pool:'war',
+    blurb:'the mountain is awake', win:'The dragon turns back to its mountain, out-reckoned.', lose:'The drake takes its toll in gold and terror.' }
+];
+const KR_FOE_POOLS = {
+  field:  { 4:['g4.multfact','g4.mult2x2','g4.add'], 5:['g5.decmult','g5.decdiv','g5.pemdas'], 6:['g6.rate','g6.percent','g6.ratio'], 7:['g7.proportion','g7.twostep','g7.integerops'] },
+  physic: { 4:['g4.fracbasic','g4.longdiv'], 5:['g5.fracunlike','g5.decadd','g5.fracofnum'], 6:['g6.fracmult','g6.fracdiv','g6.percent'], 7:['g7.percentchange','g7.taxdiscount','g7.proportion'] },
+  war:    { 4:['g4.mult2x2','g4.longdiv','g4.sub'], 5:['g5.pemdas','g5.fracunlike','g5.volume'], 6:['g6.onestep','g6.negatives','g6.ratio'], 7:['g7.twostep','g7.taxdiscount','g7.probability'] }
+};
+function krFoeSkill(foe){ const g = KR.meta.grade || 5, pool = KR_FOE_POOLS[foe.pool]; return krPick(pool[g] || pool[5]); }
+// real trouble in the living sim surfaces on the war-board as an urgent fight
+function krFoeUrgent(foe){
+  try{
+    if(foe.id === 'bandits') return (W.banditCamps && W.banditCamps.length) ? 'a real camp menaces the roads!' : null;
+    if(foe.id === 'rats'){ const s = W.settlements.find(x => x.inf > 0.02); return s ? 'plague burns in ' + s.name + '!' : null; }
+    if(foe.id === 'dragon') return (W.dragon && !W.dragon.dead && W.dragon.state && W.dragon.state !== 'sleeping') ? 'the dragon is abroad!' : null;
+    if(foe.id === 'host') return (W.pol && W.pol.war) ? 'civil war rends the realm!' : null;
+  }catch(e){}
+  return null;
+}
+function krRenderWarBoard(){
+  const el = KR.el.warBoard; if(!el) return;
+  const now = performance.now();
+  let h = '<div style="font-size:11px;font-style:italic;color:#8a7856;margin:1px 0 4px">Every true answer is a strike; every miss, a blow to your walls. Defense <b style="color:#6b4f10">' + krDefenseTotal() + '</b> — raise more in 🏰 Build.</div>';
+  KR_FOES.forEach(f => {
+    const urgent = krFoeUrgent(f), locked = KR.meta.rank < f.rank;
+    const cd = Math.ceil(((W.kr.foeCooldown[f.id] || 0) - now) / 1000);
+    h += '<div class="kwRow"><span class="kwi">' + f.ico + '</span><span class="kwn">' + f.name +
+      ' <span style="color:#8a7856">· ' + f.hp + ' strikes · ' + f.gold + ' ⛁</span>' +
+      (urgent ? '<span class="kwurgent">‼ ' + krEscape(urgent) + '</span>' : '<span class="kwsub">' + krEscape(f.blurb) + '</span>') + '</span>' +
+      (locked ? '<button disabled title="reach rank ' + f.rank + ' in the Ledger">rank ' + f.rank + '</button>'
+        : cd > 0 ? '<button disabled title="the foe licks its wounds">rests ' + cd + 's</button>'
+        : '<button data-foe="' + f.id + '">To arms ▸</button>') + '</div>';
+  });
+  el.innerHTML = h;
+  el.querySelectorAll('[data-foe]').forEach(b => b.addEventListener('click', () => { krAudioInit(); krStartBattle(b.dataset.foe); }));
+}
+function krStartBattle(id){
+  const kr = W.kr; if(!kr || kr.battle) return;
+  const foe = KR_FOES.find(f => f.id === id); if(!foe) return;
+  if(KR.meta.rank < foe.rank){ flash('rank too low to face that foe'); return; }
+  if((kr.foeCooldown[foe.id] || 0) > performance.now()){ flash('that foe licks its wounds'); return; }
   const gentle = KR.meta.settings.gentle ? 1.5 : 1;
-  const cfg = type === 'plague'
-    ? { title:'Stem the Contagion', need:5, seconds:45, per:18, sub:'Reckon the physician’s remedies before the plague spreads.' }
-    : { title:'Raise the Watch', need:6, seconds:40, per:12, sub:'Arm and provision the watch before the raid.' };
-  const town = W.settlements.find(x => x.name === place) || W.settlements[0];
-  kr.crisis = { type, place, title:cfg.title, need:cfg.need, got:0, wrong:0, errors:0,
-    endAt:performance.now() + cfg.seconds*1000*gentle, perMs:cfg.per*1000*gentle, problem:null, probEndAt:0, _lastTick:-1 };
+  let hp = foe.hp; const notes = [];
+  if(krBuilt('moat') && hp > 2){ hp -= 1; notes.push('the moat wearies the foe −1'); }
+  const volley = Math.min(krBuilt('cata'), Math.max(0, hp - 2));
+  if(volley){ hp -= volley; notes.push('your catapult' + (volley > 1 ? 's loose' : ' looses') + ' a first volley −' + volley); }
+  const def = krDefenseTotal();
+  kr.battle = { foe, hp, hpMax:foe.hp, def, defMax:def, taken:0, errors:0, urgent:krFoeUrgent(foe),
+    perMs:foe.time * 1000 * gentle, problem:null, probEndAt:0, _lastTick:-1 };
   kr._prevSpeed = W.clock.speed; setSpeed(0);
-  try{ if(typeof ANNALS !== 'undefined') ANNALS.hold(180000); }catch(e){}
-  kr._crisisTown = town;
-  if(type === 'plague' && town && town.inf < 0.02){ town.inf = 0.03; town.plagueFlag = false; }
-  KR.el.crisis.style.display = 'block';
-  KR.el.crTitle.textContent = cfg.title; KR.el.crSub.textContent = cfg.sub;
-  KR.el.crFill.style.width = '0%';
-  krChron('fate','The Reckoner rode out to meet the peril at ' + place + '.', town.x, town.z, 6);
-  krAudioDrone(); krCrisisNext();
+  try{ if(typeof ANNALS !== 'undefined') ANNALS.hold(300000); }catch(e){}
+  KR.el.warBoard.style.display = 'none';
+  KR.el.battleHud.style.display = 'block';
+  KR.el.foeIco.textContent = foe.ico; KR.el.foeName.textContent = foe.name;
+  krSetProblemVisible(true);
+  krChron('fate','The Reckoner takes the field against ' + foe.name.toLowerCase() + '.', W.settlements[0].x, W.settlements[0].z, 6);
+  krAudioDrone();
+  krBattleNext();
+  krSetFeedback('good','⚔', notes.length ? notes.join(' · ') : 'Battle is joined — answer true and strike!');
 }
-function krCrisisNext(){
-  const kr = W.kr, c = kr.crisis; if(!c) return;
-  if(c.got >= c.need){ krCrisisResolve(true); return; }
-  const skill = krCrisisSkill(c.type), tier = kr.tier[skill] || 1;
+function krBattleNext(){
+  const kr = W.kr, b = kr.battle; if(!b) return;
+  if(b.hp <= 0){ krBattleResolve(true); return; }
+  if(b.def <= 0){ krBattleResolve(false); return; }
+  const skill = krFoeSkill(b.foe), tier = kr.tier[skill] || 1;
   const p = krMakeProblem(skill, tier);
-  c.problem = p; kr.problem = p; kr.problemAt = performance.now(); kr.awaiting = true;
-  c.probEndAt = performance.now() + c.perMs;
-  krRenderProblem(p);
+  b.problem = p; kr.problem = p; kr.problemAt = performance.now(); kr.awaiting = true;
+  b.probEndAt = performance.now() + b.perMs;
+  krRenderProblem(p); krBattleRender();
 }
-function krCrisisJudge(p, ok, solveMs, mcIdx){
-  const kr = W.kr, c = kr.crisis; if(!c) return;
+function krBattleRender(){
+  const b = W.kr.battle; if(!b) return;
+  KR.el.foeHP.style.width = Math.max(0, b.hp / b.hpMax * 100) + '%';
+  KR.el.foeV.textContent = Math.max(0, b.hp) + '/' + b.hpMax;
+  KR.el.defHP.style.width = Math.max(0, b.def / b.defMax * 100) + '%';
+  KR.el.defV.textContent = Math.max(0, b.def) + '/' + b.defMax;
+}
+function krEnemyStrike(p, why){
+  const kr = W.kr, b = kr.battle; if(!b) return;
+  kr.streak = 0; krRenderStreak();
+  if(kr.watchFunded){
+    kr.watchFunded = false;
+    krSetFeedback('good','🛡', 'The funded Watch bears the blow!' + (p ? ' The tally was ' + krAnswerText(p) + '.' : ''));
+    krScheduleNext(1400); return;
+  }
+  b.def--; b.taken++; b.errors++;
+  krFlash('wrong'); krAudioWrong();
+  krSetFeedback('bad', why === 'slow' ? '⌛' : '✕',
+    (why === 'slow' ? 'Too slow — the foe strikes the walls!' : 'The foe strikes the walls!') + (p ? ' The tally: ' + krAnswerText(p) : ''));
+  krBattleRender();
+  if(b.def <= 0){ krBattleResolve(false); return; }
+  krScheduleNext(1500);
+}
+function krBattleJudge(p, ok, solveMs, mcIdx){
+  const kr = W.kr, b = kr.battle; if(!b) return;
   if(ok){
-    c.got++; krFlash('correct'); krAudioCorrect(2);
-    krSetFeedback('good','✓', (c.need - c.got > 0 ? 'Held! ' + (c.need - c.got) + ' to go' : 'The tide turns!'));
+    b.hp--; kr.streak++; kr.best = Math.max(kr.best, kr.streak);
+    kr.tallies++; kr.answered++; KR.meta.careerTallies++;
+    krFlash('correct'); krAudioCorrect(kr.streak);
+    krSetFeedback('good','⚔', b.hp > 0 ? 'A telling blow! ' + b.hp + ' more to rout them.' : 'The foe breaks!');
     if(p.format === 'mc') krHighlightChip(mcIdx, true);
     krMasteryGain(p.skill, p.tier, true);
-    kr.streak++; kr.best = Math.max(kr.best, kr.streak); krRenderStreak();
-    // crisis play must feed the same progression as normal answers (ranks, decrees, adaptive tiers).
-    // c.got already drives the crisis bar and the crisisClean decree — do not touch those here.
-    kr.tallies++; kr.answered++; KR.meta.careerTallies++;
     krRecordResult(p.skill, true, solveMs);
     krBumpDecrees({ correct:true, skill:p.skill, streak:kr.streak, solveMs, reward:0 });
-    krCheckRank();
+    krRenderStreak(); krCheckRank(); krBattleRender();
+    if(b.hp <= 0){ krBattleResolve(true); return; }
+    krScheduleNext(700);
   } else {
-    c.wrong++; c.errors++; c.endAt -= 4000;
-    krFlash('wrong'); krAudioWrong();
-    krSetFeedback('bad','✕', 'The clerk’s tally: ' + krAnswerText(p));
-    if(p.format === 'mc'){ if(typeof mcIdx === 'number') krHighlightChip(mcIdx, false); krHighlightChip(p.answer, true); }
-    kr.streak = 0; krRenderStreak();
     kr.answered++;
+    krMasteryGain(p.skill, p.tier, false);
     krRecordResult(p.skill, false, solveMs);
     krBumpDecrees({ correct:false });
+    if(p.format === 'mc'){ if(typeof mcIdx === 'number') krHighlightChip(mcIdx, false); krHighlightChip(p.answer, true); }
+    krEnemyStrike(p, 'wrong');
   }
-  krCrisisRenderBar(); krScheduleNext(ok ? 650 : 1400);
 }
-function krCrisisAfter(){ const c = W.kr.crisis; if(!c) return; if(c.got >= c.need){ krCrisisResolve(true); return; } krCrisisNext(); }
-function krCrisisRenderBar(){ const c = W.kr.crisis; if(!c) return; KR.el.crFill.style.width = Math.min(100, Math.round(c.got / c.need * 100)) + '%'; KR.el.crSub.textContent = c.got + ' / ' + c.need + ' reckoned' + (c.errors ? ' · ' + c.errors + ' amiss' : ''); }
-function krCrisisFrame(nowMs){
-  const c = W.kr.crisis; if(!c) return;
-  const left = Math.max(0, c.endAt - nowMs);
-  KR.el.crTime.textContent = krClock(left);
+function krBattleFrame(nowMs){
+  const b = W.kr.battle; if(!b) return;
+  if(!W.kr.awaiting) return;
+  const left = Math.max(0, b.probEndAt - nowMs);
+  KR.el.timerFill.style.width = (left / b.perMs * 100) + '%';
   const sec = Math.floor(left / 1000);
-  if(left <= 5000 && sec !== c._lastTick){ c._lastTick = sec; krAudioTick(); }
-  if(W.kr.awaiting && nowMs > c.probEndAt){
-    const p = c.problem; W.kr.awaiting = false; c.wrong++; c.errors++; c.endAt -= 3000;
-    krSetFeedback('bad','⌛', 'Too slow — ' + krAnswerText(p)); W.kr.streak = 0; krRenderStreak(); krCrisisRenderBar();
-    krScheduleNext(1200); return;
-  }
-  if(left <= 0) krCrisisResolve(c.got >= Math.ceil(c.need * 0.8));
+  if(left <= 5000 && sec !== b._lastTick){ b._lastTick = sec; krAudioTick(); }
+  if(left <= 0){ const p = b.problem; W.kr.awaiting = false; krEnemyStrike(p, 'slow'); }
 }
-function krCrisisResolve(win){
-  const kr = W.kr, c = kr.crisis; if(!c) return;
-  kr.crisis = null; kr.awaiting = false; KR.el.crisis.style.display = 'none';
-  const town = kr._crisisTown || W.settlements[0];
+// common teardown: cooldown, persist battle-scars, resume the sim, show the war-board again
+function krBattleEnd(){
+  const kr = W.kr, b = kr.battle; if(!b) return null;
+  kr.battle = null; kr.awaiting = false; kr.problem = null; clearTimeout(kr._nextT);
+  kr.foeCooldown[b.foe.id] = performance.now() + 90000;
+  if(b.taken > 0) KR.meta.castle.damage = Math.min(krCastleDefBuilt(), (KR.meta.castle.damage | 0) + b.taken);
+  setSpeed(kr._prevSpeed || 2);
+  KR.el.battleHud.style.display = 'none';
+  KR.el.warBoard.style.display = '';
+  krSaveMeta(true); krRenderWarBoard(); krSetProblemVisible(false);
+  return b;
+}
+function krBattleResolve(win){
+  const b = krBattleEnd(); if(!b) return;
+  const foe = b.foe, town = W.settlements[0];
   if(win){
-    const reward = c.type === 'plague' ? 600 : 400;
-    W.treasury += reward; kr.sessionGold += reward; krPulseTreasury(); krCoinBurst(reward);
-    if(c.type === 'plague' && town){ town.inf = 0; town.plagueFlag = false; }
-    krChron('fate', c.type === 'plague'
-      ? 'The Reckoner stayed the plague at ' + c.place + '; the pyres cooled and the gates reopened. ' + fmt(reward) + ' marks to the coffers.'
-      : 'The Reckoner turned back the raid at ' + c.place + '; the road is safe again. ' + fmt(reward) + ' marks earned.',
-      town.x, town.z, 7);
-    krPop(c.type === 'plague' ? '⚕' : '🛡', 'Crisis Averted', '+' + reward + ' marks'); krAudioFanfare(); krDropChest(3);
-    if(c.errors === 0) krDecreeCrisisClean();
+    W.treasury += foe.gold; W.kr.sessionGold += foe.gold; krPulseTreasury(); krCoinBurst(foe.gold);
+    try{
+      if(b.urgent){ // the fight was real: victory heals the living sim
+        if(foe.id === 'bandits' && W.banditCamps && W.banditCamps.length) removeCamp(W.banditCamps[0]);
+        else if(foe.id === 'rats'){ let worst = null; W.settlements.forEach(s => { if(s.inf > (worst ? worst.inf : 0.02)) worst = s; }); if(worst){ worst.inf = 0; worst.plagueFlag = false; } }
+        else if(foe.id === 'dragon' && W.dragon){ W.dragon.state = 'homing'; W.dragon.sleepUntil = (W.dayTicked || 0) + 2500; }
+      }
+    }catch(e){}
+    krChron('fate', foe.win + ' ' + fmt(foe.gold) + ' marks of plunder to the coffers.', town.x, town.z, 7);
+    krPop(foe.ico, 'Victory!', '+' + foe.gold + ' marks'); krAudioFanfare();
+    if(b.errors === 0){ krDropChest(4); krDecreeBattleClean(); }
+    else if(Math.random() < 0.5) krDropChest(3);
+    krSetFeedback('good','🏆','Victory! Choose your next foe from the war-board.');
   } else {
-    if(c.type === 'plague'){ const nb = W.settlements[krRi(0, W.settlements.length - 1)]; try{ if(nb && typeof infect === 'function') infect(nb, W.dayTicked, 'carried on the wind from ' + c.place); }catch(e){} }
-    else { town.prosperity = Math.max(0, town.prosperity - 0.08); town.unrest = Math.min(100, town.unrest + 10); }
-    krChron('fate', c.type === 'plague'
-      ? 'The plague slipped past the Reckoner and spread, though the worst was blunted. ' + c.place + ' will remember it.'
-      : 'The raid struck ' + c.place + ' before the watch could muster; the town is scarred but stands.',
-      town.x, town.z, 6);
-    krPop('🕯', 'The Realm Endures', 'scarred, but not lost');
+    const tribute = Math.max(0, Math.min(Math.round(W.treasury * 0.08), Math.round(foe.gold / 2)));
+    if(tribute > 0){ W.treasury -= tribute; krPulseTreasury(); }
+    try{
+      if(foe.id === 'rats'){ const nb = W.settlements[krRi(0, W.settlements.length - 1)]; if(nb && typeof infect === 'function') infect(nb, W.dayTicked, 'unchecked by the Reckoner'); }
+      else if(foe.id === 'bandits' || foe.id === 'wolves'){ town.prosperity = Math.max(0, town.prosperity - 0.06); town.unrest = Math.min(100, (town.unrest || 0) + 8); }
+    }catch(e){}
+    krChron('fate', foe.lose + (tribute ? ' ' + fmt(tribute) + ' marks are carried off.' : ''), town.x, town.z, 6);
+    krPop('🕯','The Realm Endures','mend the walls in 🏰 Build, then return'); krAudioDrone();
+    krSetFeedback('bad','🕯','The foe withdraws with tribute — never a game over. Repair, regroup, return.');
   }
-  setSpeed(kr._prevSpeed || 2); kr.lastCrisisEnd = performance.now();
-  krSaveMeta(); krScheduleNext(1600);
+}
+function krBattleFlee(){
+  const b = krBattleEnd(); if(!b) return;
+  krChron('fate','The Reckoner sounded the retreat; the ' + b.foe.name.toLowerCase() + ' holds the field.', W.settlements[0].x, W.settlements[0].z, 4);
+  krSetFeedback('bad','🏳','You withdraw in good order. The war-board awaits your return.');
+}
+
+// ---- section switching: ✒ Ledger · 🏰 Build · ⚔ Battle ----
+function krSetProblemVisible(vis){
+  KR.el.field.style.display = vis ? '' : 'none';
+  if(!vis) KR.el.prompt.innerHTML = '<span class="kghost">Choose a foe from the war-board — every true answer is a strike.</span>';
+}
+function krSyncSection(){
+  const kr = W.kr, sec = (kr && kr.section) || 'ledger';
+  document.querySelectorAll('#krTabs button').forEach(b => b.classList.toggle('on', b.dataset.sec === sec));
+  KR.el.secBuild.style.display = sec === 'build' ? '' : 'none';
+  KR.el.secBattle.style.display = sec === 'battle' ? '' : 'none';
+  KR.el.decrees.style.display = sec === 'ledger' ? '' : 'none';
+  if(sec === 'build') krRenderBuild();
+  if(sec === 'battle' && !kr.battle) krRenderWarBoard();
+  krSetProblemVisible(sec !== 'battle' || !!kr.battle);
+}
+function krSetSection(sec){
+  const kr = W.kr; if(!kr || !KR.active) return;
+  if(kr.battle && sec !== 'battle'){ flash('the battle is joined — see it through or sound the retreat'); return; }
+  if(kr.section === sec) return;
+  kr.section = sec;
+  if(sec === 'battle' && !kr.battle){
+    clearTimeout(kr._nextT); kr.awaiting = false; kr.problem = null;
+    KR.el.feedback.textContent = ''; KR.el.feedback.className = '';
+  }
+  krSyncSection();
+  if(sec !== 'battle' && !kr.awaiting) krNext();
 }
 
 // ---- per-frame + per-sim-day hooks ----
 function krFrame(dt, nowMs){
   const kr = W.kr; if(!kr) return;
-  if(kr.crisis){ krCrisisFrame(nowMs); return; }
+  if(kr.battle){ krBattleFrame(nowMs); return; }
   if(!KR.active) return;
-  const sinceStart = nowMs - kr.sessionStart, sinceCrisis = nowMs - kr.lastCrisisEnd;
-  if(!kr.ravenPending && kr.answered >= 3 && sinceStart > 45000 && sinceCrisis > 40000 && nowMs - kr.lastRaven > kr._ravenGap){
-    krShowRaven();
+  if(!kr._urgT || nowMs - kr._urgT > 500){
+    kr._urgT = nowMs;
+    let urgent = false;
+    for(const f of KR_FOES){ if(KR.meta.rank >= f.rank && krFoeUrgent(f)){ urgent = true; break; } }
+    if(KR.el.tabBattle) KR.el.tabBattle.classList.toggle('urgent', urgent);
+    if(kr.section === 'battle'){ // keep cooldowns/urgencies on the idle war-board fresh
+      const sig = KR_FOES.map(f => (krFoeUrgent(f) ? 'u' : '') + Math.max(0, Math.ceil(((kr.foeCooldown[f.id] || 0) - nowMs) / 1000))).join(',') + '|' + krDefenseTotal() + '|' + KR.meta.rank;
+      if(sig !== kr._wbSig){ kr._wbSig = sig; krRenderWarBoard(); }
+    }
   }
 }
 function krSimDay(day){
@@ -7980,13 +8220,13 @@ function krSetGrade(g){
   document.getElementById('krToggle').classList.add('on');
   W.kr.tier = {}; W.kr.win = {}; W.kr.grace = {};
   KR_GRADE_SKILLS[g].forEach(s => { W.kr.tier[s] = (KR.meta.mastery[s] >= 75) ? 3 : (KR.meta.mastery[s] >= 40 ? 2 : 1); W.kr.win[s] = []; });
-  krRollDecrees(); krRenderDecrees(); krRenderStreak(); krRenderRank();
+  krRollDecrees(); krRenderDecrees(); krRenderStreak(); krRenderRank(); krSyncSection();
   krChron('crown','A new Reckoner takes up the Crown’s ledger. Let the counting begin.', W.settlements[0].x, W.settlements[0].z, 4);
   krNext();
 }
 KR.toggleLedger = function(){
-  // Never fold the Ledger mid-crisis: the answer UI must stay reachable or the countdown is an unwinnable loss.
-  if(W && W.kr && W.kr.crisis){
+  // Never fold the Ledger mid-battle: the answer UI must stay reachable or the fight is an unwinnable loss.
+  if(W && W.kr && W.kr.battle){
     KR.el.ledger.classList.remove('krHidden');
     document.getElementById('krToggle').classList.add('on');
     KR.active = true;
@@ -7996,7 +8236,7 @@ KR.toggleLedger = function(){
   const hidden = KR.el.ledger.classList.toggle('krHidden');
   document.getElementById('krToggle').classList.toggle('on', !hidden);
   KR.active = !hidden;
-  if(!hidden && W && W.kr && !W.kr.problem && !W.kr.crisis) krNext();
+  if(!hidden && W && W.kr && !W.kr.problem) krNext();
 };
 KR.onWorldReady = function(){
   if(!W || !W.kr) return;
@@ -8005,6 +8245,7 @@ KR.onWorldReady = function(){
     KR.active = true; KR.el.grade.classList.add('krHidden'); KR.el.ledger.classList.remove('krHidden');
     document.getElementById('krToggle').classList.add('on');
     document.querySelectorAll('#krGrade .krGradeBtn').forEach(b => b.classList.toggle('on', +b.dataset.g === KR.meta.grade));
+    krSyncSection();
     krChron('flavor','The realm of ' + W.realmName + ' greets its Reckoner. Solve, and the coffers fill.', W.settlements[0].x, W.settlements[0].z, 2);
     krNext();
   } else {
@@ -8033,8 +8274,10 @@ KR.init = function(){
     input:$('krInput'), input2:$('krInput2'), unit:$('krUnit'), enter:$('krEnter'), choices:$('krChoices'),
     feedback:$('krFeedback'), decrees:$('krDecrees'), flame:$('krFlame'), mul:$('krMul'), streakN:$('krStreakN'),
     rankTxt:$('krRankTxt'), seal:$('krSeal'), rankBadge:$('krRankBadge'),
-    crisis:$('krCrisis'), crTitle:$('krcTitle'), crTime:$('krcTime'), crFill:$('krcFill'), crSub:$('krcSub'),
-    raven:$('krRaven'), ravenT:$('krRavenT'), ravenB:$('krRavenB'),
+    secBuild:$('krSecBuild'), secBattle:$('krSecBattle'), castleArt:$('krCastleArt'), defLine:$('krDefLine'), buildList:$('krBuildList'),
+    warBoard:$('krWarBoard'), battleHud:$('krBattleHud'), foeIco:$('kbFoeIco'), foeName:$('kbFoeName'),
+    foeHP:$('kbFoeHP'), foeV:$('kbFoeV'), defHP:$('kbDefHP'), defV:$('kbDefV'), timerFill:$('kbTimerFill'),
+    tabBattle:document.querySelector('#krTabs button[data-sec="battle"]'),
     pop:$('krPop'), popIco:$('krPopIco'), popT:$('krPopT'), popS:$('krPopS'),
     gild:$('krGild'), grade:$('krGrade'), studies:$('krStudies'), studiesBody:$('krStudiesBody')
   };
@@ -8046,7 +8289,6 @@ KR.init = function(){
   KR.el.input2.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); krSubmit(); } });
   ['pointerdown','pointerup','pointermove','wheel','dblclick','touchstart','contextmenu'].forEach(ev => {
     KR.el.ledger.addEventListener(ev, e => e.stopPropagation());
-    KR.el.crisis.addEventListener(ev, e => e.stopPropagation());
     KR.el.studies.addEventListener(ev, e => e.stopPropagation());
   });
   $('krToggle').addEventListener('click', () => { krAudioInit(); KR.toggleLedger(); });
@@ -8059,8 +8301,8 @@ KR.init = function(){
   $('krSound').addEventListener('click', () => { KR.meta.settings.sound = !KR.meta.settings.sound; KRA.on = KR.meta.settings.sound; if(KRA.on) krAudioInit(); krSaveMeta(true); krRenderSettings(); });
   $('krMotion').addEventListener('click', () => { KR.meta.settings.reduceMotion = !KR.meta.settings.reduceMotion; document.body.classList.toggle('krReduceMotion', KR.meta.settings.reduceMotion); krSaveMeta(true); krRenderSettings(); });
   $('krGentle').addEventListener('click', () => { KR.meta.settings.gentle = !KR.meta.settings.gentle; krSaveMeta(true); krRenderSettings(); });
-  $('krRavenYes').addEventListener('click', () => { krAudioInit(); const rp = W.kr && W.kr.ravenPending; if(rp) krStartCrisis(rp.type, rp.place); });
-  $('krRavenNo').addEventListener('click', () => krDismissRaven(true));
+  document.querySelectorAll('#krTabs button').forEach(b => b.addEventListener('click', () => { krAudioInit(); krSetSection(b.dataset.sec); }));
+  $('kbFlee').addEventListener('click', () => { krAudioInit(); krBattleFlee(); });
   window.addEventListener('keydown', krKeyCapture, true);
   window.addEventListener('keydown', e => {
     if(e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
@@ -8074,7 +8316,7 @@ KR.init = function(){
 window.RECKONING = {
   get problem(){ return (W && W.kr) ? W.kr.problem : null; },
   get answer(){ const p = (W && W.kr) ? W.kr.problem : null; return p ? krAnswerText(p) : null; },
-  get state(){ if(!W || !W.kr) return null; return { grade:KR.meta.grade, active:KR.active, streak:W.kr.streak, tallies:W.kr.tallies, tier:Object.assign({}, W.kr.tier), treasury:Math.round(W.treasury), rank:KR.meta.rank, crisis:W.kr.crisis ? W.kr.crisis.type : null, decrees:W.kr.decrees }; },
+  get state(){ if(!W || !W.kr) return null; return { grade:KR.meta.grade, active:KR.active, streak:W.kr.streak, tallies:W.kr.tallies, tier:Object.assign({}, W.kr.tier), treasury:Math.round(W.treasury), rank:KR.meta.rank, section:W.kr.section, battle:W.kr.battle ? { foe:W.kr.battle.foe.id, hp:W.kr.battle.hp, def:W.kr.battle.def, errors:W.kr.battle.errors } : null, castle:KR.meta.castle, defense:krDefenseTotal(), decrees:W.kr.decrees }; },
   answerCurrent(){
     const p = this.problem; if(!p) return 'no problem';
     if(p.format === 'mc'){ krSubmit(p.answer); return 'mc ' + p.answer; }
@@ -8090,7 +8332,10 @@ window.RECKONING = {
     KR.el.input.value = v; krSubmit(); return 'wrong';
   },
   setGrade(g){ if(W && W.kr) krSetGrade(g); return g; },
-  startCrisis(t){ if(W && W.kr) krStartCrisis(t || 'plague', krPlace()); return t; },
+  setSection(s){ if(W && W.kr) krSetSection(s); return s; },
+  startBattle(id){ if(W && W.kr){ krSetSection('battle'); krStartBattle(id || 'bandits'); } return id; },
+  commission(id){ if(W && W.kr) krCommission(id); return id; },
+  flee(){ if(W && W.kr) krBattleFlee(); },
   validate: krValidate, make: krMakeProblem, get meta(){ return KR.meta; }
 };
 
